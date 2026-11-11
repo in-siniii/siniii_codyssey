@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>식재료 발주 관리</title>
+<style>
+:root{--ink:#202522;--muted:#78817b;--line:#e5e9e6;--bg:#f5f7f5;--green:#276b4b;--green2:#e8f2ec;--red:#b83b3b;--redbg:#fff0ef;--white:#fff;--shadow:0 2px 12px #1b33200a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:14px}button,input,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:9px 13px;font-weight:600}button:hover{filter:brightness(.97)}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:var(--green);border-color:var(--green);color:#fff}.soft{background:var(--green2);border-color:#d5e6db;color:var(--green)}.danger{color:var(--red);border-color:#f0d5d3;background:#fff}.save-btn{background:#e9ecea;border-color:#e9ecea;color:#555;padding:10px 20px}.app{max-width:1180px;margin:0 auto;padding:28px 28px 60px}.top{display:flex;align-items:center;gap:24px;margin-bottom:25px}.brand{min-width:190px}.brand h1{font-size:23px;margin:0;font-weight:800;letter-spacing:-.8px}.brand p{margin:5px 0 0;color:var(--muted);font-size:12px}.nav{display:flex;gap:6px;align-items:center;flex:1}.nav button{border:0;background:transparent;color:#69736d;padding:11px 14px;white-space:nowrap}.nav button.active{background:var(--green);color:#fff}.nav .count{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;padding:0 5px;margin-left:4px;background:#d94b45;color:white;border-radius:20px;font-size:11px}.top-right{margin-left:auto}.panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:22px;box-shadow:var(--shadow)}.view{display:none}.view.active{display:block}.section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}.section-head h2{font-size:19px;margin:0 0 5px;letter-spacing:-.5px}.section-head p{margin:0;color:var(--muted);font-size:13px}.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:17px}.search{position:relative;flex:1;min-width:180px}.search input{width:100%;padding:11px 13px 11px 36px}.search:before{content:'⌕';position:absolute;left:13px;top:7px;font-size:22px;color:#8b958e}input,select{border:1px solid #dce2dd;border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink);min-width:0}input:focus,select:focus{outline:2px solid #c9e0d1;border-color:#75a98a}.view-switch{display:flex;gap:4px;background:#f1f4f1;border-radius:10px;padding:4px}.view-switch button{border:0;background:transparent;padding:8px 11px;color:#6d7770}.view-switch button.active{background:#fff;color:var(--green);box-shadow:0 1px 4px #0000000d}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;white-space:nowrap}th{text-align:left;color:#7a847e;font-size:12px;font-weight:600;background:#fafbfa;padding:12px 10px;border-bottom:1px solid var(--line)}td{padding:13px 10px;border-bottom:1px solid #edf0ed;vertical-align:middle}tbody tr:last-child td{border-bottom:0}.stock-row.low{background:#fff8f7}.stock-row.low td:first-child{border-left:3px solid #d95a53}.item-name{font-weight:700}.sub{font-size:12px;color:var(--muted);margin-top:4px}.qty{font-weight:700;font-variant-numeric:tabular-nums}.low-text{color:var(--red)}.stepper{display:flex;align-items:center;justify-content:flex-end;gap:6px}.stepper button{width:31px;height:30px;padding:0;font-size:17px;line-height:1}.stepper span{min-width:38px;text-align:center;font-weight:700}.qty-lines{display:flex;flex-direction:column;gap:7px;min-width:142px}.qty-line{display:flex;align-items:center;justify-content:space-between;gap:8px}.qty-line .stepper{gap:4px}.qty-line .stepper button{width:27px;height:27px}.total-small{font-size:11px;color:#7c867f;margin-top:2px}.actions{display:flex;gap:5px}.actions button{padding:7px 9px;font-size:12px}.group-title{padding:13px 10px;background:#f5f8f5;color:var(--green);font-weight:800;border-bottom:1px solid var(--line)}.empty{padding:54px 15px;text-align:center;color:#8a948d}.empty strong{display:block;color:#49544d;font-size:15px;margin-bottom:7px}.cards{display:none}.stock-card{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;gap:12px}.stock-card.low{background:var(--redbg);border-color:#f1d3d1}.card-main{min-width:0;flex:1}.card-main .item-name{font-size:16px}.card-meta{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.6}.card-qty{font-size:19px;font-weight:800;margin-top:7px}.card-controls{display:flex;flex-direction:column;justify-content:center;gap:7px;min-width:105px}.card-controls .qty-line{gap:4px}.card-controls .stepper{gap:4px}.card-controls .stepper span{min-width:22px}.card-actions{display:flex;gap:5px;margin-top:9px}.form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px 14px}.field label{display:block;font-size:12px;font-weight:700;color:#667169;margin-bottom:7px}.field input,.field select{width:100%}.field small{display:block;color:#89938c;font-size:11px;margin-top:6px}.unit-row{display:flex;gap:7px;align-items:center}.unit-row select{flex:1}.unit-row input{width:105px}.form-bottom{display:flex;align-items:center;justify-content:flex-end;gap:13px;margin-top:23px}.notice{font-size:12px;color:var(--muted)}.notice.error{color:var(--red)}.order-list{display:flex;flex-direction:column;gap:10px}.order-item{border:1px solid #f0d9d7;background:#fffafa;border-radius:11px;padding:15px;display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:12px;align-items:center}.order-item h3{margin:0 0 5px;font-size:15px}.order-item .detail{font-size:12px;color:var(--muted)}.order-amount{display:flex;align-items:center;gap:7px;justify-content:flex-end}.order-amount input{width:90px;text-align:right;font-weight:700}.order-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}.buyer{display:flex;flex-direction:column;gap:7px;min-width:220px}.buyer label{font-size:12px;font-weight:700;color:#667169}.buyer input{width:100%}.order-actions{display:flex;align-items:center;gap:12px}.history-card{border:1px solid var(--line);border-radius:11px;padding:16px;margin-bottom:10px}.history-top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}.history-top strong{font-size:14px}.history-top time{font-size:12px;color:var(--muted)}.history-items{color:#59645d;font-size:13px;line-height:1.8}.pill{display:inline-block;background:#f0f4f1;color:#637068;padding:3px 8px;border-radius:20px;font-size:11px;margin-left:5px}.modal-backdrop{position:fixed;inset:0;background:#17251d66;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal-backdrop.open{display:flex}.modal{background:white;border-radius:15px;padding:22px;width:min(420px,100%);box-shadow:0 15px 50px #0002}.modal h3{margin:0 0 17px}.modal .field{margin-bottom:14px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%) translateY(20px);background:#26372d;color:white;padding:12px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:.2s;z-index:20;box-shadow:0 5px 20px #0002}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.hint{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px}
+@media(max-width:800px){.app{padding:18px 15px 40px}.top{flex-wrap:wrap;gap:13px;margin-bottom:17px}.brand{min-width:0;flex:1}.brand h1{font-size:20px}.top-right{order:2;margin-left:auto}.nav{order:3;width:100%;overflow-x:auto;flex-basis:100%;gap:2px}.nav button{padding:10px 12px;font-size:13px}.panel{padding:16px}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.table-wrap{display:none}.cards{display:block}.section-head{margin-bottom:14px}.order-item{grid-template-columns:minmax(0,1fr) 150px}.order-amount input{width:78px}}
+@media(max-width:480px){body{font-size:13px}.app{padding:14px 11px 35px}.brand h1{font-size:18px}.brand p{font-size:11px}.nav{overflow:visible;display:grid;grid-template-columns:repeat(4,1fr);gap:3px}.nav button{padding:10px 3px;font-size:11px}.save-btn{padding:9px 13px;font-size:12px}.panel{padding:13px;border-radius:12px}.section-head h2{font-size:17px}.section-head p{font-size:11px}.toolbar{gap:7px}.search{flex-basis:100%}.view-switch{width:100%;justify-content:space-between}.view-switch button{flex:1;padding:8px 4px;font-size:11px}.stock-card{padding:12px 10px;gap:8px}.card-main .item-name{font-size:14px}.card-qty{font-size:17px}.card-controls{min-width:98px}.card-controls .stepper span{font-size:12px}.card-controls .stepper button{width:27px;height:28px}.card-meta{font-size:11px}.form-grid{grid-template-columns:1fr;gap:13px}.form-bottom{align-items:stretch;flex-direction:column-reverse}.form-bottom button{width:100%;padding:12px}.notice{text-align:right}.order-item{grid-template-columns:1fr;gap:12px;padding:13px}.order-amount{justify-content:flex-start}.order-bottom{align-items:stretch;flex-direction:column}.buyer{min-width:0}.order-actions{justify-content:space-between}.order-actions button{flex:1}.history-top{align-items:flex-start;flex-direction:column;gap:4px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><h1>식재료 발주 관리</h1><p>재고를 확인하고 필요한 품목을 발주하세요.</p></div>
+    <nav class="nav" aria-label="주 메뉴">
+      <button class="active" data-view="inventory">재고 목록</button>
+      <button data-view="register">품목 등록</button>
+      <button data-view="orders">발주 필요 <span id="needCount"></span></button>
+      <button data-view="history">발주 기록</button>
+    </nav>
+    <div class="top-right" id="saveArea"><button class="save-btn" id="saveBtn">저장</button></div>
+  </header>
+
+  <main>
+    <section class="view active panel" id="view-inventory">
+      <div class="section-head"><div><h2>재고 목록</h2><p>현재 보유한 품목과 수량을 확인하고 관리합니다.</p></div></div>
+      <div class="toolbar">
+        <div class="search"><input id="searchInput" type="search" placeholder="품목 이름 검색" autocomplete="off" /></div>
+        <div class="view-switch" aria-label="보기 방식"><button class="active" data-mode="all">전체 보기</button><button data-mode="supplier">거래처별 보기</button><button data-mode="category">분류별 보기</button></div>
+      </div>
+      <div id="inventoryTable" class="table-wrap"></div><div id="inventoryCards" class="cards"></div>
+    </section>
+
+    <section class="view panel" id="view-register">
+      <div class="section-head"><div><h2>품목 등록</h2><p>새로 관리할 식재료 또는 공산품 정보를 입력하세요.</p></div></div>
+      <form id="registerForm">
+        <div class="form-grid">
+          <div class="field"><label for="itemName">품목 이름 *</label><input id="itemName" required placeholder="예: 양파" /></div>
+          <div class="field"><label for="category">분류 *</label><select id="category" required><option value="">분류 선택</option><option>채소</option><option>육류</option><option>수산</option><option>유제품</option><option>양념</option><option>공산품</option><option>기타</option></select></div>
+          <div class="field"><label for="supplier">거래처 *</label><input id="supplier" required placeholder="예: ○○식자재" /></div>
+          <div class="field"><label for="bundleUnit">묶음 단위</label><select id="bundleUnit"><option value="">없음</option><option>박스</option><option>판</option><option>봉지</option><option>팩</option><option>통</option><option>묶음</option><option value="custom">직접입력</option></select><div class="unit-row" id="bundleCustomWrap" hidden><input id="bundleCustom" placeholder="묶음 단위 입력" /></div></div>
+          <div class="field"><label for="eachUnit">낱개 단위 *</label><select id="eachUnit" required><option value="">단위 선택</option><option>개</option><option>kg</option><option>g</option><option>L</option><option>박스</option><option>판</option><option>봉지</option><option>팩</option><option>통</option><option>묶음</option><option value="custom">직접입력</option></select><div class="unit-row" id="eachCustomWrap" hidden><input id="eachCustom" placeholder="낱개 단위 입력" /></div></div>
+          <div class="field" id="bundleSizeField" hidden><label for="bundleSize">묶음당 낱개 수 *</label><input id="bundleSize" type="number" min="1" step="1" placeholder="예: 30" /></div>
+          <div class="field" id="bundleQtyField" hidden><label for="bundleQty">현재 묶음 수량 *</label><input id="bundleQty" type="number" min="0" step="1" placeholder="예: 2" /></div>
+          <div class="field"><label for="eachQty">현재 낱개 수량 *</label><input id="eachQty" type="number" min="0" step="any" placeholder="예: 5" required /></div>
+          <div class="field"><label for="requiredQty">필요 수량 (낱개 기준) *</label><input id="requiredQty" type="number" min="0" step="any" placeholder="예: 90" required /></div>
+        </div>
+        <div class="form-bottom"><span class="notice" id="registerMessage">* 표시된 항목을 모두 입력해 주세요.</span><button class="primary" type="submit">등록</button></div>
+      </form>
+    </section>
+
+    <section class="view panel" id="view-orders">
+      <div class="section-head"><div><h2>발주 필요 목록</h2><p>필요 수량보다 재고가 적은 품목입니다. 발주 수량은 직접 수정할 수 있습니다.</p></div></div>
+      <div id="orderList" class="order-list"></div>
+      <div class="order-bottom" id="orderBottom" hidden>
+        <div class="buyer"><label for="buyerName">발주자 이름 *</label><input id="buyerName" placeholder="발주한 사람 이름" /></div>
+        <div class="order-actions"><span class="notice" id="orderMessage"></span><button class="primary" id="completeOrder">발주 완료</button></div>
+      </div>
+    </section>
+
+    <section class="view panel" id="view-history">
+      <div class="section-head"><div><h2>발주 기록</h2><p>완료한 발주 내역을 최근 순서대로 확인합니다.</p></div></div>
+      <div id="historyList"></div>
+    </section>
+  </main>
+</div>
+<div class="modal-backdrop" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+  <div class="modal"><h3 id="editTitle">품목 수정</h3><div class="field"><label for="editRequired">필요 수량 (낱개 기준)</label><input id="editRequired" type="number" min="0" step="any" /></div><div class="field" id="editBundleField"><label for="editBundleSize">묶음당 낱개 수</label><input id="editBundleSize" type="number" min="1" step="1" /></div><div class="modal-actions"><button id="cancelEdit">취소</button><button class="primary" id="confirmEdit">변경 저장</button></div></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  const STORAGE_KEY = 'food-order-manager-v2';
+  const seed = {
+    items:[
+      {id:1,name:'양파',category:'채소',bundleUnit:'',eachUnit:'kg',bundleSize:0,bundleQty:0,eachQty:4,required:8,supplier:'○○채소'},
+      {id:2,name:'대파',category:'채소',bundleUnit:'',eachUnit:'kg',bundleSize:0,bundleQty:0,eachQty:2,required:5,supplier:'○○채소'},
+      {id:3,name:'돼지고기',category:'육류',bundleUnit:'팩',eachUnit:'kg',bundleSize:5,bundleQty:1,eachQty:1,required:10,supplier:'△△정육'},
+      {id:4,name:'계란',category:'유제품',bundleUnit:'판',eachUnit:'개',bundleSize:30,bundleQty:2,eachQty:5,required:90,supplier:'□□식자재'},
+      {id:5,name:'식용유',category:'양념',bundleUnit:'통',eachUnit:'L',bundleSize:0,bundleQty:0,eachQty:3,required:2,supplier:'□□식자재'},
+      {id:6,name:'물티슈',category:'공산품',bundleUnit:'박스',eachUnit:'개',bundleSize:100,bundleQty:0,eachQty:35,required:100,supplier:'□□식자재'},
+      {id:7,name:'상추',category:'채소',bundleUnit:'봉지',eachUnit:'봉지',bundleSize:0,bundleQty:0,eachQty:3,required:6,supplier:'○○채소'},
+      {id:8,name:'주방 세제',category:'공산품',bundleUnit:'',eachUnit:'통',bundleSize:0,bundleQty:0,eachQty:2,required:2,supplier:'□□식자재'}
+    ], history:[], nextId:9
+  };
+  const clone = obj => JSON.parse(JSON.stringify(obj));
+  let saved = loadSaved();
+  let state = clone(saved);
+  let viewMode = 'all';
+  let editingId = null;
+  let orderQuantities = {};
+  const $ = id => document.getElementById(id);
+  function loadSaved(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const data=JSON.parse(raw);if(data&&Array.isArray(data.items)&&Array.isArray(data.history))return data;}}catch(e){}return clone(seed);}
+  function persist(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));saved=clone(state);}
+  function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2200);}
+  function total(item){return item.bundleUnit ? Number(item.bundleQty||0)*Number(item.bundleSize||0)+Number(item.eachQty||0) : Number(item.eachQty||0);}
+  function low(item){return total(item)<Number(item.required);}
+  function needed(){return state.items.filter(low);}
+  function fmt(n){return Number.isInteger(Number(n))?String(Number(n)):String(Number(n).toFixed(2)).replace(/0+$/,'').replace(/\.$/,'');}
+  function qtyText(item){if(item.bundleUnit)return `${fmt(item.bundleQty)}${item.bundleUnit} ${fmt(item.eachQty)}${item.eachUnit}`;return `${fmt(item.eachQty)}${item.eachUnit}`;}
+  function totalText(item){return item.bundleUnit?`총 ${fmt(total(item))}${item.eachUnit}`:'';}
+  function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function showView(name){document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id===`view-${name}`));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));$('saveArea').style.visibility=name==='register'?'hidden':'visible';if(name==='orders')renderOrders();if(name==='history')renderHistory();}
+  document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+  function updateCount(){const n=needed().length;$('needCount').innerHTML=n?`<span class="count">${n}</span>`:'';}
+  function renderInventory(){
+    const query=$('searchInput').value.trim().toLowerCase();let items=state.items.filter(i=>i.name.toLowerCase().includes(query));
+    const groups=[];
+    if(viewMode==='all')groups.push({title:'전체 품목',items});
+    else {const key=viewMode==='supplier'?'supplier':'category';const map=new Map();items.forEach(i=>{const k=i[key]||'미분류';if(!map.has(k))map.set(k,[]);map.get(k).push(i);});[...map.keys()].sort((a,b)=>a.localeCompare(b,'ko')).forEach(k=>groups.push({title:k,items:map.get(k)}));}
+    let table='<table><thead><tr><th>품목 이름</th><th>분류</th><th>현재 수량</th><th>필요 수량</th><th>거래처</th><th style="text-align:right">수량 변경</th><th>관리</th></tr></thead><tbody>';
+    let cards='';let any=false;
+    groups.forEach(g=>{if(!g.items.length)return;any=true;if(viewMode!=='all')table+=`<tr><td colspan="7" class="group-title">${escapeHtml(g.title)} <span class="pill">${g.items.length}개</span></td></tr>`;
+      g.items.forEach(i=>{const isLow=low(i);const cls=isLow?'low':'';const qtyCell=i.bundleUnit?`<div class="qty-lines">${stepLine(i,'bundleQty',i.bundleUnit)}${stepLine(i,'eachQty',i.eachUnit)}<div class="total-small">${totalText(i)}</div></div>`:`<div class="qty-lines"><div class="qty-line"><span class="qty">${fmt(i.eachQty)} ${escapeHtml(i.eachUnit)}</span>${stepper(i.id,'eachQty')}</div></div>`;
+        table+=`<tr class="stock-row ${cls}"><td><span class="item-name">${escapeHtml(i.name)}</span></td><td>${escapeHtml(i.category)}</td><td class="${isLow?'low-text':''}">${qtyCell}</td><td>${fmt(i.required)} ${escapeHtml(i.eachUnit)}</td><td>${escapeHtml(i.supplier)}</td><td></td><td><div class="actions"><button data-edit="${i.id}">수정</button><button class="danger" data-delete="${i.id}">삭제</button></div></td></tr>`;
+        const controls=i.bundleUnit?`${cardStep(i,'bundleQty',i.bundleUnit)}${cardStep(i,'eachQty',i.eachUnit)}`:cardStep(i,'eachQty',i.eachUnit);
+        cards+=`<article class="stock-card ${cls}"><div class="card-main"><div class="item-name">${escapeHtml(i.name)}</div><div class="card-qty ${isLow?'low-text':''}">${escapeHtml(qtyText(i))}</div>${i.bundleUnit?`<div class="total-small">${totalText(i)}</div>`:''}<div class="card-meta">${escapeHtml(i.category)} · 필요 ${fmt(i.required)}${escapeHtml(i.eachUnit)}<br>거래처 · ${escapeHtml(i.supplier)}</div><div class="card-actions"><button data-edit="${i.id}">수정</button><button class="danger" data-delete="${i.id}">삭제</button></div></div><div class="card-controls">${controls}</div></article>`;
+      });
+    });
+    table+='</tbody></table>';
+    if(!any){$('inventoryTable').innerHTML=`<div class="empty"><strong>검색 결과가 없습니다.</strong>품목 이름을 다시 확인해 주세요.</div>`;$('inventoryCards').innerHTML='';}
+    else {$('inventoryTable').innerHTML=table;$('inventoryCards').innerHTML=cards;}
+    bindInventoryActions();updateCount();
+  }
+  function stepper(id,field){return `<div class="stepper"><button aria-label="수량 줄이기" data-step="${id}" data-field="${field}" data-delta="-1">−</button><button aria-label="수량 늘리기" data-step="${id}" data-field="${field}" data-delta="1">＋</button></div>`;}
+  function stepLine(i,field,unit){return `<div class="qty-line"><span class="qty">${fmt(i[field])} ${escapeHtml(unit)}</span>${stepper(i.id,field)}</div>`;}
+  function cardStep(i,field,unit){return `<div class="qty-line"><span>${escapeHtml(unit)}</span><div class="stepper"><button aria-label="${escapeHtml(unit)} 수량 줄이기" data-step="${i.id}" data-field="${field}" data-delta="-1">−</button><span>${fmt(i[field])}</span><button aria-label="${escapeHtml(unit)} 수량 늘리기" data-step="${i.id}" data-field="${field}" data-delta="1">＋</button></div></div>`;}
+  function bindInventoryActions(){document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{const item=state.items.find(i=>i.id===Number(b.dataset.step));if(!item)return;const f=b.dataset.field;item[f]=Math.max(0,Number(item[f]||0)+Number(b.dataset.delta));renderInventory();}));document.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openEdit(Number(b.dataset.edit))));document.querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>{const id=Number(b.dataset.delete);const item=state.items.find(i=>i.id===id);if(!item)return;if(confirm(`'${item.name}' 품목을 삭제할까요?`)){state.items=state.items.filter(i=>i.id!==id);delete orderQuantities[id];renderInventory();renderOrders();}}));}
+  $('searchInput').addEventListener('input',renderInventory);
+  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{viewMode=b.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));renderInventory();}));
+  function openEdit(id){const item=state.items.find(i=>i.id===id);if(!item)return;editingId=id;$('editRequired').value=item.required;$('editBundleField').hidden=!item.bundleUnit;$('editBundleSize').value=item.bundleSize||'';$('editModal').classList.add('open');}
+  $('cancelEdit').addEventListener('click',()=>$('editModal').classList.remove('open'));
+  $('editModal').addEventListener('click',e=>{if(e.target===$('editModal'))$('editModal').classList.remove('open');});
+  $('confirmEdit').addEventListener('click',()=>{const item=state.items.find(i=>i.id===editingId);const req=Number($('editRequired').value);const size=Number($('editBundleSize').value);if(!item||$('editRequired').value===''||!Number.isFinite(req)||req<0||(item.bundleUnit&&(!Number.isInteger(size)||size<1))){toast('올바른 수량을 입력해 주세요.');return;}item.required=req;if(item.bundleUnit)item.bundleSize=size;$('editModal').classList.remove('open');renderInventory();renderOrders();});
+  function toggleCustom(selectId,wrapId,inputId){const custom=$(selectId).value==='custom';$(wrapId).hidden=!custom;if(!custom)$(inputId).value='';}
+  $('bundleUnit').addEventListener('change',()=>{toggleCustom('bundleUnit','bundleCustomWrap','bundleCustom');const has=!!$('bundleUnit').value;$('bundleSizeField').hidden=!has;$('bundleQtyField').hidden=!has;if(!has){$('bundleSize').value='';$('bundleQty').value='';}});
+  $('eachUnit').addEventListener('change',()=>toggleCustom('eachUnit','eachCustomWrap','eachCustom'));
+  function selectedUnit(selectId,customId){return $(selectId).value==='custom'?$(customId).value.trim():$(selectId).value;}
+  $('registerForm').addEventListener('submit',e=>{e.preventDefault();const bundle=$('bundleUnit').value;const bundleUnit=bundle==='custom'?$('bundleCustom').value.trim():bundle;const eachUnit=selectedUnit('eachUnit','eachCustom');const bundleSize=Number($('bundleSize').value);const bundleQty=Number($('bundleQty').value);const eachQty=Number($('eachQty').value);const required=Number($('requiredQty').value);
+    const requiredFields=[$('itemName').value.trim(),$('category').value,$('supplier').value.trim(),eachUnit,$('eachQty').value,$('requiredQty').value];if(bundle){requiredFields.push(bundleUnit,$('bundleSize').value,$('bundleQty').value);}
+    if(requiredFields.some(v=>v===''||v===null)||!Number.isFinite(eachQty)||eachQty<0||!Number.isFinite(required)||required<0||(bundle&&(!Number.isInteger(bundleSize)||bundleSize<1||!Number.isInteger(bundleQty)||bundleQty<0))){$('registerMessage').textContent='모든 칸을 올바르게 입력해 주세요.';$('registerMessage').classList.add('error');return;}
+    const name=$('itemName').value.trim();if(state.items.some(i=>i.name.toLowerCase()===name.toLowerCase())){$('registerMessage').textContent='이미 등록된 품목 이름입니다.';$('registerMessage').classList.add('error');return;}
+    state.items.push({id:state.nextId++,name,category:$('category').value,supplier:$('supplier').value.trim(),bundleUnit,eachUnit,bundleSize:bundle?bundleSize:0,bundleQty:bundle?bundleQty:0,eachQty,required});persist();$('registerForm').reset();$('bundleCustomWrap').hidden=true;$('eachCustomWrap').hidden=true;$('bundleSizeField').hidden=true;$('bundleQtyField').hidden=true;$('registerMessage').textContent='등록되었습니다. 재고 목록에 반영하고 자동 저장했습니다.';$('registerMessage').classList.remove('error');renderInventory();toast('품목이 등록되고 저장되었습니다.');showView('inventory');
+  });
+  function renderOrders(){const items=needed();orderQuantities={};let html='';items.forEach(i=>{const amount=Math.max(0,Number(i.required)-total(i));orderQuantities[i.id]=amount;html+=`<article class="order-item"><div><h3>${escapeHtml(i.name)} <span class="pill">${escapeHtml(i.supplier)}</span></h3><div class="detail">현재 ${escapeHtml(qtyText(i))}${i.bundleUnit?` · 총 ${fmt(total(i))}${escapeHtml(i.eachUnit)}`:''} / 필요 ${fmt(i.required)}${escapeHtml(i.eachUnit)}</div></div><div class="order-amount"><label for="order-${i.id}">발주 수량</label><input id="order-${i.id}" type="number" min="0" step="any" value="${fmt(amount)}" data-order-qty="${i.id}" /><span>${escapeHtml(i.eachUnit)}</span></div></article>`;});
+    $('orderList').innerHTML=items.length?html:'<div class="empty"><strong>발주가 필요한 품목이 없습니다.</strong>현재 모든 품목의 재고가 필요 수량 이상입니다.</div>';$('orderBottom').hidden=!items.length;$('orderMessage').textContent='';
+  }
+  $('completeOrder').addEventListener('click',()=>{const buyer=$('buyerName').value.trim();if(!buyer){$('orderMessage').textContent='발주자 이름을 입력해 주세요.';$('orderMessage').classList.add('error');return;}const pending=needed();if(!pending.length){renderOrders();return;}const orders=[];for(const item of pending){const input=document.querySelector(`[data-order-qty="${item.id}"]`);const amount=Number(input?.value);if(!input||input.value===''||!Number.isFinite(amount)||amount<0){$('orderMessage').textContent='발주 수량을 0 이상의 숫자로 입력해 주세요.';$('orderMessage').classList.add('error');return;}orders.push({item,amount});}
+    const now=new Date();const record={date:now.toLocaleDateString('ko-KR'),time:now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hour12:false}),buyer,items:[]};orders.forEach(({item,amount})=>{if(item.bundleUnit){const totalQty=total(item)+amount;item.bundleQty=Math.floor((totalQty+1e-9)/item.bundleSize);item.eachQty=Number((totalQty-item.bundleQty*item.bundleSize).toFixed(6));}else item.eachQty=Number((item.eachQty+amount).toFixed(6));record.items.push({name:item.name,amount,unit:item.eachUnit,supplier:item.supplier});});state.history.unshift(record);persist();$('buyerName').value='';renderInventory();renderOrders();renderHistory();toast('발주가 완료되고 재고 및 기록이 저장되었습니다.');});
+  function renderHistory(){if(!state.history.length){$('historyList').innerHTML='<div class="empty"><strong>발주 기록이 없습니다.</strong>발주를 완료하면 이곳에 내역이 쌓입니다.</div>';return;}$('historyList').innerHTML=state.history.map(r=>`<article class="history-card"><div class="history-top"><strong>${escapeHtml(r.buyer)} <span class="pill">발주 완료</span></strong><time>${escapeHtml(r.date)} ${escapeHtml(r.time)}</time></div><div class="history-items">${r.items.map(i=>`${escapeHtml(i.name)} · ${fmt(i.amount)}${escapeHtml(i.unit)}`).join('<br>')}</div></article>`).join('');}
+  $('saveBtn').addEventListener('click',()=>{try{persist();toast('저장되었습니다.');}catch(e){toast('저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.');}});
+  renderInventory();renderOrders();renderHistory();
+})();
+</script>
+</body>
+</html>
