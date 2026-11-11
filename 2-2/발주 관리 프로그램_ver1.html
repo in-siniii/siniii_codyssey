@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>식재료 발주 관리</title>
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --main: #2f6b4f;
+    --main-light: #e8f2ec;
+    --line: #d9dee3;
+    --text: #222;
+    --sub: #666;
+    --red: #d93025;
+    --red-bg: #fdecea;
+    --gray: #6b7280;
+  }
+  body {
+    margin: 0;
+    font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    color: var(--text);
+    background: #f5f6f7;
+    font-size: 15px;
+    line-height: 1.5;
+    word-break: keep-all;
+  }
+  button, input, select { font: inherit; }
+  button { cursor: pointer; }
+
+  /* ===== 상단 메뉴 ===== */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    padding: 12px 20px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  header h1 { margin: 0; font-size: 20px; color: var(--main); white-space: nowrap; }
+  nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  .menu-btn {
+    min-height: 44px; padding: 8px 16px;
+    border: 1px solid var(--main); border-radius: 8px;
+    background: #fff; color: var(--main); font-weight: 600;
+    white-space: nowrap;
+  }
+  .menu-btn.active { background: var(--main); color: #fff; }
+  .save-btn {
+    margin-left: auto;
+    min-height: 44px; padding: 8px 20px;
+    border: none; border-radius: 8px;
+    background: var(--gray); color: #fff; font-weight: 600;
+  }
+  .save-btn:hover { background: #555b65; }
+  .hidden { display: none !important; }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 20px; }
+  .screen { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+  .screen h2 { margin: 0 0 16px; font-size: 18px; }
+
+  /* ===== 재고 목록 ===== */
+  .toolbar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .search {
+    flex: 1 1 220px; min-height: 44px; padding: 8px 12px;
+    border: 1px solid var(--line); border-radius: 8px;
+  }
+  .view-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .view-btn {
+    min-height: 44px; padding: 8px 14px;
+    border: 1px solid var(--line); border-radius: 8px; background: #fff;
+  }
+  .view-btn.active { border-color: var(--main); background: var(--main-light); color: var(--main); font-weight: 600; }
+
+  .table-wrap { overflow-x: auto; }
+  table.inv { width: 100%; border-collapse: collapse; }
+  table.inv th, table.inv td {
+    border-bottom: 1px solid var(--line);
+    padding: 8px 10px; text-align: left; vertical-align: top;
+  }
+  table.inv th { background: #f0f2f4; font-size: 14px; white-space: nowrap; }
+  table.inv td.name { font-weight: 600; padding-top: 16px; }
+  table.inv td.plain { padding-top: 16px; }
+  table.inv tr.group td { background: var(--main-light); color: var(--main); font-weight: 700; padding: 8px 10px; }
+  table.inv tr.low td { background: var(--red-bg); }
+  table.inv tr.low td.name, table.inv tr.low .qtext { color: var(--red); }
+  table.inv th.col-btns, table.inv td.col-btns { width: 110px; }
+  table.inv th.col-act, table.inv td.col-act { width: 140px; }
+
+  .qline { height: 44px; display: flex; align-items: center; }
+  .qtext { font-weight: 600; }
+  .qtotal { font-size: 13px; color: var(--sub); }
+  .pm { display: flex; gap: 6px; }
+  .pm button {
+    width: 44px; height: 38px; border-radius: 8px;
+    border: 1px solid var(--line); background: #fff; font-size: 20px; font-weight: 700; line-height: 1;
+  }
+  .pm button:active { background: #eee; }
+  .act-btns { display: flex; gap: 6px; padding-top: 4px; }
+  .small-btn {
+    min-height: 38px; padding: 4px 12px; border-radius: 8px;
+    border: 1px solid var(--line); background: #fff; white-space: nowrap;
+  }
+  .small-btn.danger { color: var(--red); border-color: #f1b5b0; }
+
+  .cards { display: none; }
+  .empty { padding: 30px 10px; text-align: center; color: var(--sub); }
+
+  /* ===== 품목 등록 ===== */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+  .field label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+  .field input, .field select {
+    width: 100%; min-height: 44px; padding: 8px 10px;
+    border: 1px solid var(--line); border-radius: 8px; background: #fff;
+  }
+  .field .with-custom { display: flex; gap: 8px; }
+  .field .with-custom select { flex: 1; }
+  .field .with-custom input { flex: 1; }
+  .field .hint { font-size: 13px; color: var(--sub); margin-top: 2px; }
+  .form-foot {
+    display: flex; justify-content: flex-end; align-items: center; gap: 12px;
+    margin-top: 20px; flex-wrap: wrap;
+  }
+  .msg { font-weight: 600; }
+  .msg.ok { color: var(--main); }
+  .msg.err { color: var(--red); }
+  .main-btn {
+    min-height: 48px; padding: 10px 28px; border: none; border-radius: 8px;
+    background: var(--main); color: #fff; font-weight: 700; font-size: 16px;
+  }
+
+  /* ===== 발주 필요 ===== */
+  .order-list { display: flex; flex-direction: column; gap: 10px; }
+  .order-item {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    border: 1px solid var(--line); border-left: 5px solid var(--red);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .order-item .oi-info { flex: 1 1 220px; min-width: 0; }
+  .order-item .oi-name { font-weight: 700; font-size: 16px; }
+  .order-item .oi-sub { font-size: 13px; color: var(--sub); }
+  .order-item .oi-input { display: flex; align-items: center; gap: 6px; }
+  .order-item .oi-input label { font-size: 14px; font-weight: 600; white-space: nowrap; }
+  .order-item .oi-input input {
+    width: 100px; min-height: 44px; padding: 6px 10px;
+    border: 1px solid var(--line); border-radius: 8px; text-align: right;
+  }
+  .order-item .oi-split { font-size: 13px; color: var(--main); width: 100%; text-align: right; }
+  .order-foot {
+    display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-wrap: wrap;
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line);
+  }
+  .order-foot input {
+    min-height: 48px; padding: 8px 12px; width: 200px;
+    border: 1px solid var(--line); border-radius: 8px;
+  }
+
+  /* ===== 발주 기록 ===== */
+  table.rec { width: 100%; border-collapse: collapse; }
+  table.rec th, table.rec td { border-bottom: 1px solid var(--line); padding: 10px; text-align: left; vertical-align: top; }
+  table.rec th { background: #f0f2f4; font-size: 14px; white-space: nowrap; }
+  table.rec ul { margin: 0; padding-left: 18px; }
+
+  /* ===== 수정 창 ===== */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,.4);
+    display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px;
+  }
+  .modal { background: #fff; border-radius: 12px; padding: 20px; width: 100%; max-width: 380px; }
+  .modal h3 { margin: 0 0 14px; }
+  .modal .field { margin-bottom: 12px; }
+  .modal-foot { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+
+  /* ===== 알림 ===== */
+  .toast {
+    position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%);
+    background: #333; color: #fff; padding: 12px 22px; border-radius: 24px;
+    font-weight: 600; z-index: 100; opacity: 0; transition: opacity .25s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ===== 휴대폰 화면 ===== */
+  @media (max-width: 720px) {
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas: "title save" "nav nav";
+      gap: 10px; padding: 10px 12px;
+    }
+    header h1 { grid-area: title; font-size: 18px; align-self: center; }
+    .save-btn { grid-area: save; margin-left: 0; }
+    nav { grid-area: nav; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .menu-btn { padding: 6px 2px; font-size: 13px; white-space: normal; line-height: 1.25; }
+    main { padding: 12px; }
+    .screen { padding: 14px; }
+
+    .table-wrap { display: none; }
+    .cards { display: flex; flex-direction: column; gap: 10px; }
+    .group-title { font-weight: 700; color: var(--main); background: var(--main-light); padding: 6px 10px; border-radius: 6px; margin-top: 6px; }
+    .card { border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: #fff; }
+    .card.low { background: var(--red-bg); border-color: #f1b5b0; border-left: 5px solid var(--red); }
+    .card-name { font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
+    .card.low .card-name, .card.low .qtext { color: var(--red); }
+    .card .qrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; }
+    .card .qrow .qtext { font-size: 20px; overflow-wrap: anywhere; min-width: 0; }
+    .card .pm button { width: 48px; height: 44px; }
+    .card .meta { font-size: 13px; color: var(--sub); margin-top: 4px; overflow-wrap: anywhere; }
+    .card .card-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; }
+    .card .small-btn { min-height: 44px; }
+
+    .form-grid { grid-template-columns: 1fr; }
+    .form-foot { justify-content: flex-end; }
+    .order-foot input { width: 100%; flex: 1 1 100%; }
+    .order-foot .main-btn { flex: 1 1 auto; }
+
+    table.rec thead { display: none; }
+    table.rec, table.rec tbody, table.rec tr, table.rec td { display: block; width: 100%; }
+    table.rec tr { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; padding: 6px 4px; }
+    table.rec td { border: none; padding: 4px 10px; }
+    table.rec td::before { content: attr(data-label) " : "; font-weight: 700; color: var(--sub); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>식재료 발주 관리</h1>
+  <nav>
+    <button class="menu-btn" data-screen="inventory">재고 목록</button>
+    <button class="menu-btn" data-screen="register">품목 등록</button>
+    <button class="menu-btn" data-screen="order" id="orderMenuBtn">발주 필요</button>
+    <button class="menu-btn" data-screen="records">발주 기록</button>
+  </nav>
+  <button class="save-btn" id="saveBtn">저장</button>
+</header>
+
+<main>
+  <!-- 재고 목록 -->
+  <section class="screen" id="screen-inventory">
+    <h2>재고 목록</h2>
+    <div class="toolbar">
+      <input type="search" class="search" id="searchInput" placeholder="품목 이름으로 검색 (예: 파)">
+      <div class="view-btns">
+        <button class="view-btn active" data-view="all">전체 보기</button>
+        <button class="view-btn" data-view="vendor">거래처별 보기</button>
+        <button class="view-btn" data-view="category">분류별 보기</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="inv">
+        <thead>
+          <tr>
+            <th>품목 이름</th><th>분류</th><th>현재 수량</th><th>필요 수량</th><th>거래처</th>
+            <th class="col-btns">수량 변경</th><th class="col-act">수정 / 삭제</th>
+          </tr>
+        </thead>
+        <tbody id="invTbody"></tbody>
+      </table>
+    </div>
+    <div class="cards" id="invCards"></div>
+    <div class="empty hidden" id="invEmpty"></div>
+  </section>
+
+  <!-- 품목 등록 -->
+  <section class="screen hidden" id="screen-register">
+    <h2>품목 등록</h2>
+    <div class="form-grid">
+      <div class="field">
+        <label for="fName">품목 이름</label>
+        <input id="fName" type="text" placeholder="예: 양파">
+      </div>
+      <div class="field">
+        <label for="fCat">분류</label>
+        <select id="fCat"></select>
+      </div>
+      <div class="field">
+        <label for="fBundleUnit">묶음 단위</label>
+        <div class="with-custom">
+          <select id="fBundleUnit"></select>
+          <input id="fBundleCustom" type="text" placeholder="단위 직접 입력" class="hidden">
+        </div>
+      </div>
+      <div class="field">
+        <label for="fUnit">낱개 단위</label>
+        <div class="with-custom">
+          <select id="fUnit"></select>
+          <input id="fUnitCustom" type="text" placeholder="단위 직접 입력" class="hidden">
+        </div>
+      </div>
+      <div class="field bundle-only">
+        <label for="fPer" id="lblPer">묶음당 낱개 수</label>
+        <input id="fPer" type="number" min="1" step="1" inputmode="numeric" placeholder="예: 30">
+      </div>
+      <div class="field bundle-only">
+        <label for="fBundleQty" id="lblBundleQty">현재 수량 (묶음)</label>
+        <input id="fBundleQty" type="number" min="0" step="1" inputmode="numeric" placeholder="예: 2">
+      </div>
+      <div class="field">
+        <label for="fQty" id="lblQty">현재 수량</label>
+        <input id="fQty" type="number" min="0" step="any" inputmode="decimal" placeholder="예: 5">
+      </div>
+      <div class="field">
+        <label for="fNeed" id="lblNeed">필요 수량</label>
+        <input id="fNeed" type="number" min="0" step="any" inputmode="decimal" placeholder="예: 10">
+        <div class="hint bundle-only">묶음 단위를 쓰는 품목은 낱개 단위 기준으로 입력합니다. (예: 계란 90개)</div>
+      </div>
+      <div class="field">
+        <label for="fVendor">거래처</label>
+        <input id="fVendor" type="text" list="vendorList" placeholder="예: 싱싱채소">
+        <datalist id="vendorList"></datalist>
+      </div>
+    </div>
+    <div class="form-foot">
+      <span class="msg" id="regMsg"></span>
+      <button class="main-btn" id="registerBtn">등록</button>
+    </div>
+  </section>
+
+  <!-- 발주 필요 -->
+  <section class="screen hidden" id="screen-order">
+    <h2>발주 필요 목록</h2>
+    <div class="order-list" id="orderList"></div>
+    <div class="empty hidden" id="orderEmpty">발주가 필요한 품목이 없습니다</div>
+    <div class="order-foot" id="orderFoot">
+      <span class="msg" id="orderMsg"></span>
+      <input type="text" id="ordererInput" placeholder="발주자 이름 (예: 김민지)" list="ordererList">
+      <datalist id="ordererList"><option value="김민지"><option value="박준호"></datalist>
+      <button class="main-btn" id="orderBtn">발주 완료</button>
+    </div>
+  </section>
+
+  <!-- 발주 기록 -->
+  <section class="screen hidden" id="screen-records">
+    <h2>발주 기록</h2>
+    <div id="recordsWrap"></div>
+  </section>
+</main>
+
+<!-- 수정 창 -->
+<div class="modal-bg hidden" id="editModal">
+  <div class="modal">
+    <h3 id="editTitle">품목 수정</h3>
+    <div class="field">
+      <label for="eNeed" id="eNeedLbl">필요 수량</label>
+      <input id="eNeed" type="number" min="0" step="any" inputmode="decimal">
+    </div>
+    <div class="field" id="ePerField">
+      <label for="ePer" id="ePerLbl">묶음당 낱개 수</label>
+      <input id="ePer" type="number" min="1" step="1" inputmode="numeric">
+    </div>
+    <div class="modal-foot">
+      <span class="msg err" id="editMsg"></span>
+      <button class="small-btn" id="editCancel">취소</button>
+      <button class="main-btn" id="editApply">적용</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= 기본 설정 ================= */
+const STORAGE_KEY = "ingredientOrder_v1";
+const CATEGORIES = ["채소", "육류", "수산", "유제품", "양념", "공산품", "기타"];
+const BUNDLE_UNITS = ["없음", "박스", "판", "봉지", "팩", "통", "묶음", "직접입력"];
+const UNITS = ["개", "kg", "g", "L", "박스", "판", "봉지", "팩", "통", "묶음", "직접입력"];
+
+// 처음 열었을 때 보여 줄 예시 품목
+// bundleUnit 이 "" 이면 묶음 단위를 쓰지 않는 품목입니다.
+const SAMPLE_ITEMS = [
+  { name: "양파",       category: "채소",   bundleUnit: "",   unit: "kg", perBundle: 0,  bundleQty: 0, qty: 8,  need: 10, vendor: "싱싱채소" },
+  { name: "대파",       category: "채소",   bundleUnit: "",   unit: "단", perBundle: 0,  bundleQty: 0, qty: 4,  need: 3,  vendor: "싱싱채소" },
+  { name: "쪽파",       category: "채소",   bundleUnit: "",   unit: "단", perBundle: 0,  bundleQty: 0, qty: 1,  need: 2,  vendor: "싱싱채소" },
+  { name: "돼지고기 앞다리", category: "육류", bundleUnit: "", unit: "kg", perBundle: 0,  bundleQty: 0, qty: 15, need: 10, vendor: "한우리정육" },
+  { name: "계란",       category: "유제품", bundleUnit: "판", unit: "개", perBundle: 30, bundleQty: 2, qty: 5,  need: 90, vendor: "한빛식자재" },
+  { name: "식용유",     category: "양념",   bundleUnit: "",   unit: "통", perBundle: 0,  bundleQty: 0, qty: 2,  need: 3,  vendor: "한빛식자재" },
+  { name: "고춧가루",   category: "양념",   bundleUnit: "",   unit: "kg", perBundle: 0,  bundleQty: 0, qty: 3,  need: 2,  vendor: "한빛식자재" },
+  { name: "휴지",       category: "공산품", bundleUnit: "박스", unit: "롤", perBundle: 30, bundleQty: 1, qty: 10, need: 40, vendor: "한빛식자재" },
+  { name: "물티슈",     category: "공산품", bundleUnit: "",   unit: "팩", perBundle: 0,  bundleQty: 0, qty: 6,  need: 10, vendor: "한빛식자재" }
+];
+
+function makeDefaultState() {
+  return {
+    nextId: SAMPLE_ITEMS.length + 1,
+    items: SAMPLE_ITEMS.map((it, i) => Object.assign({ id: i + 1 }, it)),
+    records: []
+  };
+}
+
+/* ================= 저장 / 불러오기 ================= */
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && Array.isArray(data.items) && Array.isArray(data.records)) return data;
+    }
+  } catch (e) { /* 저장된 내용을 읽지 못하면 예시로 시작 */ }
+  return makeDefaultState();
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    return true;
+  } catch (e) {
+    showToast("저장하지 못했습니다. 브라우저 저장 공간을 확인해 주세요.");
+    return false;
+  }
+}
+
+let state = loadState();
+let currentScreen = "inventory";
+let viewMode = "all";
+let searchText = "";
+let orderOverrides = {};   // 발주 수량을 직접 고친 값 { 품목id: "숫자" }
+let editingId = null;
+
+/* ================= 계산 도우미 ================= */
+const round = n => Math.round(n * 100) / 100;
+const fmt = n => String(round(n));
+const usesBundle = it => !!it.bundleUnit;
+const totalOf = it => usesBundle(it) ? round(it.bundleQty * it.perBundle + it.qty) : round(it.qty);
+const isLow = it => totalOf(it) < it.need;
+const autoOrder = it => round(it.need - totalOf(it));
+const lowItems = () => state.items.filter(isLow);
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// 낱개 수를 묶음 + 낱개로 나눈 글자 (예: 65개 → 2판 5개)
+function splitText(it, amount) {
+  const b = Math.floor(amount / it.perBundle);
+  const rest = round(amount - b * it.perBundle);
+  return `${b}${it.bundleUnit} ${fmt(rest)}${it.unit}`;
+}
+
+function qtyLines(it) {
+  if (usesBundle(it)) {
+    return [
+      { part: "bundle", text: `${fmt(it.bundleQty)}${it.bundleUnit}` },
+      { part: "unit", text: `${fmt(it.qty)}${it.unit}` }
+    ];
+  }
+  return [{ part: "unit", text: `${fmt(it.qty)}${it.unit}` }];
+}
+
+function pmButtons(it, part) {
+  return `<span class="pm">
+    <button data-act="inc" data-id="${it.id}" data-part="${part}" aria-label="${esc(it.name)} 1 늘리기">+</button>
+    <button data-act="dec" data-id="${it.id}" data-part="${part}" aria-label="${esc(it.name)} 1 줄이기">−</button>
+  </span>`;
+}
+
+function actButtons(it) {
+  return `<button class="small-btn" data-act="edit" data-id="${it.id}">수정</button>
+          <button class="small-btn danger" data-act="delete" data-id="${it.id}">삭제</button>`;
+}
+
+/* ================= 화면 전환 ================= */
+function showScreen(name) {
+  currentScreen = name;
+  document.querySelectorAll(".screen").forEach(s => s.classList.add("hidden"));
+  document.getElementById("screen-" + name).classList.remove("hidden");
+  document.querySelectorAll(".menu-btn").forEach(b => b.classList.toggle("active", b.dataset.screen === name));
+  document.getElementById("saveBtn").classList.toggle("hidden", name === "register");
+  if (name !== "register") setMsg("regMsg", "");
+  window.scrollTo(0, 0);
+}
+
+/* ================= 그리기 ================= */
+function renderAll() {
+  renderBadge();
+  renderInventory();
+  renderOrder();
+  renderRecords();
+  renderVendorList();
+}
+
+function renderBadge() {
+  const n = lowItems().length;
+  document.getElementById("orderMenuBtn").textContent = n > 0 ? `발주 필요 (${n})` : "발주 필요";
+}
+
+function getGroups(items) {
+  if (viewMode === "all") return [{ title: null, items }];
+  const key = viewMode === "vendor" ? "vendor" : "category";
+  const map = new Map();
+  items.forEach(it => {
+    if (!map.has(it[key])) map.set(it[key], []);
+    map.get(it[key]).push(it);
+  });
+  let titles = [...map.keys()];
+  if (key === "category") titles.sort((a, b) => CATEGORIES.indexOf(a) - CATEGORIES.indexOf(b));
+  else titles.sort((a, b) => a.localeCompare(b, "ko"));
+  return titles.map(t => ({ title: t, items: map.get(t) }));
+}
+
+function renderInventory() {
+  const q = searchText.trim();
+  const items = state.items.filter(it => it.name.includes(q));
+  const tbody = document.getElementById("invTbody");
+  const cards = document.getElementById("invCards");
+  const empty = document.getElementById("invEmpty");
+
+  if (items.length === 0) {
+    tbody.innerHTML = "";
+    cards.innerHTML = "";
+    empty.textContent = state.items.length === 0 ? "등록된 품목이 없습니다" : "검색 결과가 없습니다";
+    empty.classList.remove("hidden");
+    return;
+  }
+  empty.classList.add("hidden");
+
+  let rows = "", cardHtml = "";
+  getGroups(items).forEach(g => {
+    if (g.title !== null) {
+      rows += `<tr class="group"><td colspan="7">${esc(g.title)} (${g.items.length})</td></tr>`;
+      cardHtml += `<div class="group-title">${esc(g.title)} (${g.items.length})</div>`;
+    }
+    g.items.forEach(it => {
+      const lines = qtyLines(it);
+      const low = isLow(it) ? "low" : "";
+      const totalLine = usesBundle(it) ? `<div class="qtotal">총 ${fmt(totalOf(it))}${esc(it.unit)} (1${esc(it.bundleUnit)} = ${it.perBundle}${esc(it.unit)})</div>` : "";
+
+      // 컴퓨터용 표
+      rows += `<tr class="${low}">
+        <td class="name">${esc(it.name)}</td>
+        <td class="plain">${esc(it.category)}</td>
+        <td>${lines.map(l => `<div class="qline"><span class="qtext">${esc(l.text)}</span></div>`).join("")}${totalLine}</td>
+        <td class="plain">${fmt(it.need)}${esc(it.unit)}</td>
+        <td class="plain">${esc(it.vendor)}</td>
+        <td class="col-btns">${lines.map(l => `<div class="qline">${pmButtons(it, l.part)}</div>`).join("")}</td>
+        <td class="col-act"><div class="act-btns">${actButtons(it)}</div></td>
+      </tr>`;
+
+      // 휴대폰용 카드
+      cardHtml += `<div class="card ${low}">
+        <div class="card-name">${esc(it.name)}</div>
+        ${lines.map(l => `<div class="qrow"><span class="qtext">${esc(l.text)}</span>${pmButtons(it, l.part)}</div>`).join("")}
+        ${totalLine}
+        <div class="meta">${esc(it.category)} · 필요 ${fmt(it.need)}${esc(it.unit)} · ${esc(it.vendor)}</div>
+        <div class="card-actions">${actButtons(it)}</div>
+      </div>`;
+    });
+  });
+  tbody.innerHTML = rows;
+  cards.innerHTML = cardHtml;
+}
+
+function orderAmountOf(it) {
+  return (it.id in orderOverrides) ? orderOverrides[it.id] : String(autoOrder(it));
+}
+
+function renderOrder() {
+  const list = lowItems();
+  const listEl = document.getElementById("orderList");
+  document.getElementById("orderEmpty").classList.toggle("hidden", list.length > 0);
+  document.getElementById("orderFoot").classList.toggle("hidden", list.length === 0);
+
+  listEl.innerHTML = list.map(it => {
+    const val = orderAmountOf(it);
+    const num = parseFloat(val);
+    const split = usesBundle(it) && num > 0 ? `= ${splitText(it, num)}` : "";
+    return `<div class="order-item">
+      <div class="oi-info">
+        <div class="oi-name">${esc(it.name)}</div>
+        <div class="oi-sub">현재 ${fmt(totalOf(it))}${esc(it.unit)} / 필요 ${fmt(it.need)}${esc(it.unit)} · ${esc(it.vendor)}</div>
+      </div>
+      <div class="oi-input">
+        <label for="oq-${it.id}">발주 수량</label>
+        <input id="oq-${it.id}" type="number" min="0" step="any" inputmode="decimal" data-order-id="${it.id}" value="${esc(val)}">
+        <span>${esc(it.unit)}</span>
+      </div>
+      ${usesBundle(it) ? `<div class="oi-split" id="split-${it.id}">${esc(split)}</div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function renderRecords() {
+  const wrap = document.getElementById("recordsWrap");
+  if (state.records.length === 0) {
+    wrap.innerHTML = `<div class="empty">발주 기록이 없습니다</div>`;
+    return;
+  }
+  wrap.innerHTML = `<table class="rec">
+    <thead><tr><th>발주 날짜</th><th>발주 시간</th><th>발주자</th><th>발주한 품목과 발주 수량</th></tr></thead>
+    <tbody>${state.records.map(r => `<tr>
+      <td data-label="발주 날짜">${esc(r.date)}</td>
+      <td data-label="발주 시간">${esc(r.time)}</td>
+      <td data-label="발주자">${esc(r.orderer)}</td>
+      <td data-label="발주 품목"><ul>${r.items.map(x =>
+        `<li>${esc(x.name)} ${esc(x.amount)}${esc(x.unit)}${x.split ? ` (${esc(x.split)})` : ""}</li>`).join("")}</ul></td>
+    </tr>`).join("")}</tbody>
+  </table>`;
+}
+
+function renderVendorList() {
+  const vendors = [...new Set(state.items.map(it => it.vendor))];
+  document.getElementById("vendorList").innerHTML = vendors.map(v => `<option value="${esc(v)}">`).join("");
+}
+
+/* ================= 알림 ================= */
+let toastTimer = null;
+function showToast(text) {
+  const t = document.getElementById("toast");
+  t.textContent = text;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2000);
+}
+function setMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = "msg" + (type ? " " + type : "");
+}
+
+/* ================= 재고 목록 동작 ================= */
+function findItem(id) { return state.items.find(it => it.id === Number(id)); }
+
+function changeQty(id, part, delta) {
+  const it = findItem(id);
+  if (!it) return;
+  if (part === "bundle") it.bundleQty = Math.max(0, round(it.bundleQty + delta));
+  else it.qty = Math.max(0, round(it.qty + delta));
+  delete orderOverrides[it.id];  // 수량이 바뀌면 발주 수량을 다시 계산
+  renderAll();
+}
+
+function deleteItem(id) {
+  state.items = state.items.filter(it => it.id !== Number(id));
+  delete orderOverrides[id];
+  renderAll();
+}
+
+function handleInvClick(e) {
+  const btn = e.target.closest("button[data-act]");
+  if (!btn) return;
+  const { act, id, part } = btn.dataset;
+  if (act === "inc") changeQty(id, part, 1);
+  else if (act === "dec") changeQty(id, part, -1);
+  else if (act === "edit") openEdit(id);
+  else if (act === "delete") deleteItem(id);
+}
+document.getElementById("invTbody").addEventListener("click", handleInvClick);
+document.getElementById("invCards").addEventListener("click", handleInvClick);
+
+document.getElementById("searchInput").addEventListener("input", e => {
+  searchText = e.target.value;
+  renderInventory();
+});
+
+document.querySelectorAll(".view-btn").forEach(b => b.addEventListener("click", () => {
+  viewMode = b.dataset.view;
+  document.querySelectorAll(".view-btn").forEach(x => x.classList.toggle("active", x === b));
+  renderInventory();
+}));
+
+/* ================= 수정 창 ================= */
+function openEdit(id) {
+  const it = findItem(id);
+  if (!it) return;
+  editingId = it.id;
+  document.getElementById("editTitle").textContent = `${it.name} 수정`;
+  document.getElementById("eNeedLbl").textContent = `필요 수량 (${it.unit})`;
+  document.getElementById("eNeed").value = it.need;
+  const perField = document.getElementById("ePerField");
+  perField.classList.toggle("hidden", !usesBundle(it));
+  if (usesBundle(it)) {
+    document.getElementById("ePerLbl").textContent = `묶음당 낱개 수 (1${it.bundleUnit} = ?${it.unit})`;
+    document.getElementById("ePer").value = it.perBundle;
+  }
+  setMsg("editMsg", "", "err");
+  document.getElementById("editModal").classList.remove("hidden");
+  document.getElementById("eNeed").focus();
+}
+function closeEdit() {
+  editingId = null;
+  document.getElementById("editModal").classList.add("hidden");
+}
+document.getElementById("editCancel").addEventListener("click", closeEdit);
+document.getElementById("editModal").addEventListener("click", e => { if (e.target.id === "editModal") closeEdit(); });
+document.getElementById("editApply").addEventListener("click", () => {
+  const it = findItem(editingId);
+  if (!it) return closeEdit();
+  const needStr = document.getElementById("eNeed").value.trim();
+  const need = parseFloat(needStr);
+  if (needStr === "" || isNaN(need) || need < 0) return setMsg("editMsg", "필요 수량을 0 이상으로 입력해 주세요", "err");
+  if (usesBundle(it)) {
+    const perStr = document.getElementById("ePer").value.trim();
+    const per = Number(perStr);
+    if (perStr === "" || !Number.isInteger(per) || per < 1) return setMsg("editMsg", "묶음당 낱개 수는 1 이상 정수로 입력해 주세요", "err");
+    it.perBundle = per;
+  }
+  it.need = round(need);
+  delete orderOverrides[it.id];
+  closeEdit();
+  renderAll();
+});
+
+/* ================= 품목 등록 ================= */
+const $ = id => document.getElementById(id);
+function fillSelect(sel, options) {
+  sel.innerHTML = `<option value="">선택해 주세요</option>` + options.map(o => `<option value="${o}">${o}</option>`).join("");
+}
+fillSelect($("fCat"), CATEGORIES);
+fillSelect($("fBundleUnit"), BUNDLE_UNITS);
+fillSelect($("fUnit"), UNITS);
+
+function chosenUnit(selId, customId) {
+  const v = $(selId).value;
+  return v === "직접입력" ? $(customId).value.trim() : v;
+}
+
+function updateRegisterForm() {
+  $("fBundleCustom").classList.toggle("hidden", $("fBundleUnit").value !== "직접입력");
+  $("fUnitCustom").classList.toggle("hidden", $("fUnit").value !== "직접입력");
+  const bundleSel = $("fBundleUnit").value;
+  const hasBundle = bundleSel !== "" && bundleSel !== "없음";
+  document.querySelectorAll("#screen-register .bundle-only").forEach(el => el.classList.toggle("hidden", !hasBundle));
+
+  const bu = chosenUnit("fBundleUnit", "fBundleCustom") || "묶음";
+  const u = chosenUnit("fUnit", "fUnitCustom") || "낱개";
+  $("lblPer").textContent = `묶음당 낱개 수 (1${bu} = ?${u})`;
+  $("lblBundleQty").textContent = `현재 수량 (${bu})`;
+  $("lblQty").textContent = hasBundle ? `현재 수량 (${u})` : `현재 수량${$("fUnit").value ? ` (${u})` : ""}`;
+  $("lblNeed").textContent = hasBundle ? `필요 수량 (${u} 기준)` : `필요 수량${$("fUnit").value ? ` (${u})` : ""}`;
+}
+["fBundleUnit", "fUnit"].forEach(id => $(id).addEventListener("change", updateRegisterForm));
+["fBundleCustom", "fUnitCustom"].forEach(id => $(id).addEventListener("input", updateRegisterForm));
+updateRegisterForm();
+
+$("registerBtn").addEventListener("click", () => {
+  const bundleSel = $("fBundleUnit").value;
+  const hasBundle = bundleSel !== "" && bundleSel !== "없음";
+  const values = {
+    name: $("fName").value.trim(),
+    category: $("fCat").value,
+    bundleSel,
+    bundleUnit: hasBundle ? chosenUnit("fBundleUnit", "fBundleCustom") : "",
+    unit: chosenUnit("fUnit", "fUnitCustom"),
+    per: $("fPer").value.trim(),
+    bundleQty: $("fBundleQty").value.trim(),
+    qty: $("fQty").value.trim(),
+    need: $("fNeed").value.trim(),
+    vendor: $("fVendor").value.trim()
+  };
+
+  // 화면에 보이는 칸이 모두 채워졌는지 확인
+  const required = [values.name, values.category, values.bundleSel, values.unit, values.qty, values.need, values.vendor];
+  if (hasBundle) required.push(values.bundleUnit, values.per, values.bundleQty);
+  if (required.some(v => v === "")) return setMsg("regMsg", "모든 칸을 입력해 주세요", "err");
+
+  const qty = parseFloat(values.qty), need = parseFloat(values.need);
+  if (isNaN(qty) || qty < 0 || isNaN(need) || need < 0) return setMsg("regMsg", "수량은 0 이상 숫자로 입력해 주세요", "err");
+  let per = 0, bundleQty = 0;
+  if (hasBundle) {
+    per = Number(values.per);
+    bundleQty = Number(values.bundleQty);
+    if (!Number.isInteger(per) || per < 1) return setMsg("regMsg", "묶음당 낱개 수는 1 이상 정수로 입력해 주세요", "err");
+    if (!Number.isInteger(bundleQty) || bundleQty < 0) return setMsg("regMsg", "묶음 수량은 0 이상 정수로 입력해 주세요", "err");
+  }
+
+  state.items.push({
+    id: state.nextId++,
+    name: values.name,
+    category: values.category,
+    bundleUnit: values.bundleUnit,
+    unit: values.unit,
+    perBundle: per,
+    bundleQty,
+    qty: round(qty),
+    need: round(need),
+    vendor: values.vendor
+  });
+  saveState();   // 등록하면 그때까지 바꾼 내용 모두 자동 저장
+  renderAll();
+
+  ["fName", "fPer", "fBundleQty", "fQty", "fNeed", "fVendor", "fBundleCustom", "fUnitCustom"].forEach(id => $(id).value = "");
+  ["fCat", "fBundleUnit", "fUnit"].forEach(id => $(id).value = "");
+  updateRegisterForm();
+  setMsg("regMsg", "등록되었습니다", "ok");
+  $("fName").focus();
+});
+
+/* ================= 발주 필요 ================= */
+$("orderList").addEventListener("input", e => {
+  const id = e.target.dataset.orderId;
+  if (!id) return;
+  orderOverrides[id] = e.target.value;
+  const it = findItem(id);
+  const splitEl = document.getElementById("split-" + id);
+  if (it && splitEl) {
+    const num = parseFloat(e.target.value);
+    splitEl.textContent = num > 0 ? `= ${splitText(it, num)}` : "";
+  }
+});
+
+function pad(n) { return String(n).padStart(2, "0"); }
+
+$("orderBtn").addEventListener("click", () => {
+  const orderer = $("ordererInput").value.trim();
+  if (!orderer) return setMsg("orderMsg", "발주자 이름을 입력해 주세요", "err");
+
+  const list = lowItems();
+  const plan = [];
+  for (const it of list) {
+    const str = String(orderAmountOf(it)).trim();
+    const amount = str === "" ? 0 : parseFloat(str);
+    if (isNaN(amount) || amount < 0) return setMsg("orderMsg", `${it.name}의 발주 수량을 0 이상 숫자로 입력해 주세요`, "err");
+    if (amount > 0) plan.push({ it, amount: round(amount) });
+  }
+  if (plan.length === 0) return setMsg("orderMsg", "발주 수량을 입력해 주세요", "err");
+
+  const recItems = [];
+  plan.forEach(({ it, amount }) => {
+    let split = "";
+    if (usesBundle(it)) {
+      const b = Math.floor(amount / it.perBundle);
+      const rest = round(amount - b * it.perBundle);
+      it.bundleQty += b;
+      it.qty = round(it.qty + rest);
+      split = `${b}${it.bundleUnit} ${fmt(rest)}${it.unit}`;
+    } else {
+      it.qty = round(it.qty + amount);
+    }
+    recItems.push({ name: it.name, amount: fmt(amount), unit: it.unit, split });
+  });
+
+  const now = new Date();
+  state.records.unshift({
+    date: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
+    time: `${pad(now.getHours())}:${pad(now.getMinutes())}`,
+    orderer,
+    items: recItems
+  });
+
+  orderOverrides = {};
+  saveState();   // 발주 완료하면 그때까지 바꾼 내용 모두 자동 저장
+  $("ordererInput").value = "";
+  renderAll();
+  setMsg("orderMsg", "", "");
+  showToast("발주가 완료되었습니다");
+});
+
+/* ================= 메뉴 / 저장 ================= */
+document.querySelectorAll(".menu-btn").forEach(b => b.addEventListener("click", () => showScreen(b.dataset.screen)));
+$("saveBtn").addEventListener("click", () => { if (saveState()) showToast("저장되었습니다"); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && editingId !== null) closeEdit(); });
+
+renderAll();
+showScreen("inventory");
+</script>
+</body>
+</html>
