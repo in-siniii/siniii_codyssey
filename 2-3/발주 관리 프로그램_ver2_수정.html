@@ -20,7 +20,7 @@ table.hist tr.memo-row td{background:transparent;color:#4f5a53;padding:10px 14px
 .hist-cards{display:none}.hist-card{border:1px solid var(--line);border-radius:11px;padding:14px;margin-bottom:10px}.hist-card-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}.hist-card-top span{color:var(--muted);font-size:12px}
 .hist-card-memo{margin-top:10px;padding:9px 0 0;background:transparent;border-top:1px dashed var(--line);color:#4f5a53;font-size:13px}
 @media(max-width:800px){.hist-wrap{display:none}.hist-cards{display:block}}
-.hist-filter{display:flex;align-items:center;gap:8px;flex-shrink:0}.hist-filter label{font-size:12px;font-weight:700;color:#667169}.hist-filter select{min-width:140px}
+.hist-filter{display:flex;align-items:center;gap:8px;flex-shrink:0}.hist-filter label{font-size:12px;font-weight:700;color:#667169}.hist-filter .dd{min-width:150px}
 .memo-empty{color:#a3aca6}
 tbody.hist-rec.latest{background:#f1f7f3}.hist-card.latest{background:#f1f7f3;border-color:#cfe2d6}.latest-pill{display:table;margin:6px 0 0;background:var(--green);color:#fff}.hist-card-top .latest-pill{display:inline-block;margin:0 0 0 6px}tbody.hist-rec tr:first-child td{padding-top:28px}.hist-card{padding-top:24px}
 </style>
@@ -76,13 +76,13 @@ tbody.hist-rec.latest{background:#f1f7f3}.hist-card.latest{background:#f1f7f3;bo
       <div id="orderList" class="order-list"></div>
       <div class="order-memo" id="orderMemoWrap" hidden><label for="orderMemo">메모</label><textarea id="orderMemo" maxlength="300" placeholder="예: 다음 주 화요일 오전 배송 요청"></textarea></div>
       <div class="order-bottom" id="orderBottom" hidden>
-        <div class="buyer"><label for="buyerName">발주자 이름 *</label><input id="buyerName" placeholder="발주한 사람 이름" /></div>
+        <div class="buyer"><label for="buyerSelectBtn">발주자 이름 *</label><div class="dd" data-for="buyerSelect"><button type="button" class="dd-btn placeholder" id="buyerSelectBtn" aria-haspopup="listbox" aria-expanded="false">발주자 선택</button><ul class="dd-list" role="listbox" hidden></ul></div><input type="hidden" id="buyerSelect" value="" /><div class="unit-row" id="buyerCustomWrap" hidden><input id="buyerName" placeholder="발주자 이름 직접 입력" autocomplete="off" /></div></div>
         <div class="order-actions"><span class="notice" id="orderMessage"></span><button class="primary" id="completeOrder">발주 완료</button></div>
       </div>
     </section>
 
     <section class="view panel" id="view-history">
-      <div class="section-head"><div><h2>발주 기록</h2><p>완료한 발주 내역을 최근 순서대로 확인합니다.</p></div><div class="hist-filter"><select id="histMonth" aria-label="월 선택"><option value="all">전체</option></select></div></div>
+      <div class="section-head"><div><h2>발주 기록</h2><p>완료한 발주 내역을 최근 순서대로 확인합니다.</p></div><div class="hist-filter"><div class="dd" id="histMonthDD"><button type="button" class="dd-btn" id="histMonthBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="월 선택">전체</button><ul class="dd-list" role="listbox" hidden></ul></div><input type="hidden" id="histMonth" value="all" /></div></div>
       <div id="historyList"></div>
       <div class="pagination" id="historyPagination" aria-label="발주 기록 페이지 이동"></div>
     </section>
@@ -223,14 +223,15 @@ tbody.hist-rec.latest{background:#f1f7f3}.hist-card.latest{background:#f1f7f3;bo
     category:{placeholder:'분류 선택',head:[],tail:[['custom','직접입력']],base:['채소','육류','수산','유제품','양념','공산품']},
     bundleUnit:{placeholder:'없음',head:[['','없음']],tail:[['custom','직접입력']],base:['박스','판','봉지','팩','통','묶음']},
     eachUnit:{placeholder:'단위 선택',head:[],tail:[['custom','직접입력']],base:['개','kg','g','L','박스','판','봉지','팩','통','묶음']},
-    supplierSelect:{placeholder:'거래처 선택',head:[],tail:[['custom','직접입력']],base:[]}
+    supplierSelect:{placeholder:'거래처 선택',head:[],tail:[['custom','직접입력']],base:[]},
+    buyerSelect:{placeholder:'발주자 선택',head:[],tail:[['custom','직접입력']],base:['김민지','박준호']}
   };
-  const DD_DEFAULT={category:'',bundleUnit:'',eachUnit:'',supplierSelect:''};
+  const DD_DEFAULT={category:'',bundleUnit:'',eachUnit:'',supplierSelect:'',buyerSelect:''};
   const byKo=(a,b)=>a.localeCompare(b,'ko');
   function initialOptions(){const uniq=a=>[...new Set(a.filter(Boolean))];const it=state.items;
     return {category:uniq([...DD.category.base,...it.map(i=>i.category)]),bundleUnit:uniq([...DD.bundleUnit.base,...it.map(i=>i.bundleUnit)]),
-      eachUnit:uniq([...DD.eachUnit.base,...it.map(i=>i.eachUnit)]),supplierSelect:uniq(it.map(i=>i.supplier)).sort(byKo)};}
-  let ddOptions=(()=>{try{const o=JSON.parse(localStorage.getItem(OPTIONS_KEY));if(o&&Object.keys(DD).every(k=>Array.isArray(o[k])))return o;}catch(e){}return initialOptions();})();
+      eachUnit:uniq([...DD.eachUnit.base,...it.map(i=>i.eachUnit)]),supplierSelect:uniq(it.map(i=>i.supplier)).sort(byKo),buyerSelect:[...DD.buyerSelect.base]};}
+  let ddOptions=(()=>{try{const o=JSON.parse(localStorage.getItem(OPTIONS_KEY));if(o&&typeof o==='object'){const init=initialOptions();Object.keys(DD).forEach(k=>{if(!Array.isArray(o[k]))o[k]=init[k];});return o;}}catch(e){}return initialOptions();})();
   function saveOptions(){try{localStorage.setItem(OPTIONS_KEY,JSON.stringify(ddOptions));}catch(e){}}
   function addOption(id,value){if(!value||ddOptions[id].includes(value))return;ddOptions[id].push(value);if(id==='supplierSelect')ddOptions[id].sort(byKo);}
   function ddLabel(id){const v=$(id).value;const f=[...DD[id].head,...DD[id].tail].find(x=>x[0]===v);return f?f[1]:(v||DD[id].placeholder);}
@@ -244,7 +245,7 @@ tbody.hist-rec.latest{background:#f1f7f3}.hist-card.latest{background:#f1f7f3;bo
   const renderSupplierOptions=renderAllDropdowns;
   function closeDropdowns(except){document.querySelectorAll('.dd').forEach(w=>{if(w===except)return;w.querySelector('.dd-list').hidden=true;w.querySelector('.dd-btn').setAttribute('aria-expanded','false');});}
   function setDropdown(id,value){$(id).value=value;renderDropdown(id);$(id).dispatchEvent(new Event('change'));}
-  document.querySelectorAll('.dd').forEach(wrap=>{const id=wrap.dataset.for,list=wrap.querySelector('.dd-list'),btn=wrap.querySelector('.dd-btn');
+  document.querySelectorAll('.dd[data-for]').forEach(wrap=>{const id=wrap.dataset.for,list=wrap.querySelector('.dd-list'),btn=wrap.querySelector('.dd-btn');
     btn.addEventListener('click',()=>{const open=list.hidden;closeDropdowns(wrap);list.hidden=!open;btn.setAttribute('aria-expanded',String(open));});
     list.addEventListener('click',e=>{
       const del=e.target.closest('.dd-del');
@@ -257,8 +258,8 @@ tbody.hist-rec.latest{background:#f1f7f3}.hist-card.latest{background:#f1f7f3;bo
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDropdowns();});
 
   function selectedValue(selectId,customId){return $(selectId).value==='custom'?$(customId).value.trim():$(selectId).value;}
-  const CUSTOM_INPUT={category:'categoryCustom',bundleUnit:'bundleCustom',eachUnit:'eachCustom',supplierSelect:'supplier'};
-  const CUSTOM_WRAP={category:'categoryCustomWrap',bundleUnit:'bundleCustomWrap',eachUnit:'eachCustomWrap',supplierSelect:'supplierCustomWrap'};
+  const CUSTOM_INPUT={category:'categoryCustom',bundleUnit:'bundleCustom',eachUnit:'eachCustom',supplierSelect:'supplier',buyerSelect:'buyerName'};
+  const CUSTOM_WRAP={category:'categoryCustomWrap',bundleUnit:'bundleCustomWrap',eachUnit:'eachCustomWrap',supplierSelect:'supplierCustomWrap',buyerSelect:'buyerCustomWrap'};
   function updateRegisterForm(){
     Object.keys(CUSTOM_WRAP).forEach(id=>$(CUSTOM_WRAP[id]).hidden=$(id).value!=='custom');
     const has=!!$('bundleUnit').value;
@@ -298,7 +299,7 @@ tbody.hist-rec.latest{background:#f1f7f3}.hist-card.latest{background:#f1f7f3;bo
     state.items.push({id:state.nextId++,name,category,supplier,bundleUnit,eachUnit,bundleSize,bundleQty,eachQty,required});persist();
     // 직접 입력한 이름은 드롭다운 목록에 다시 추가
     addOption('category',category);if(has)addOption('bundleUnit',bundleUnit);addOption('eachUnit',eachUnit);addOption('supplierSelect',supplier);saveOptions();
-    $('registerForm').reset();Object.keys(DD).forEach(id=>$(id).value=DD_DEFAULT[id]);renderAllDropdowns();
+    $('registerForm').reset();Object.keys(DD).filter(id=>id!=='buyerSelect').forEach(id=>$(id).value=DD_DEFAULT[id]);renderAllDropdowns();
     $('registerMessage').textContent='* 표시된 항목을 모두 입력해 주세요.';$('registerMessage').classList.remove('error');
     renderInventory();toast('품목이 등록되고 저장되었습니다.');showView('inventory');
   });
@@ -371,7 +372,7 @@ tbody.hist-rec.latest{background:#f1f7f3}.hist-card.latest{background:#f1f7f3;bo
   document.addEventListener('click',e=>{if(!e.target.closest('.order-add'))$('orderAddList').hidden=true;});
 
   function orderError(msg){$('orderMessage').textContent=msg;$('orderMessage').classList.add('error');}
-  $('completeOrder').addEventListener('click',()=>{const buyer=$('buyerName').value.trim();if(!buyer)return orderError('발주자 이름을 입력해 주세요.');
+  $('completeOrder').addEventListener('click',()=>{const buyer=selectedValue('buyerSelect','buyerName');if(!buyer)return orderError('발주자 이름을 입력해 주세요.');
     const list=orderListItems();if(!list.length){renderOrders();return;}
     const orders=[];
     for(const item of list){const o=currentAmount(item);const b=item.bundleUnit?Number(o.b||0):0,e=Number(o.e||0);
@@ -388,18 +389,23 @@ tbody.hist-rec.latest{background:#f1f7f3}.hist-card.latest{background:#f1f7f3;bo
       }else item.eachQty=Number((item.eachQty+amount).toFixed(6));
       record.items.push({name:item.name,amount,unit:item.eachUnit,supplier:item.supplier,split,note:(orderNotes[item.id]||'').trim()});});
     state.history.unshift(record);historyPage=1;manualOrderIds.clear();excludedIds.clear();orderInputs={};orderNotes={};openNotes.clear();$('orderMemo').value='';persist();
-    $('buyerName').value='';renderInventory();renderOrders();renderHistory();toast('발주가 완료되고 재고 및 기록이 저장되었습니다.');});
+    addOption('buyerSelect',buyer);saveOptions();$('buyerName').value='';$('buyerSelect').value='';renderDropdown('buyerSelect');updateRegisterForm();renderInventory();renderOrders();renderHistory();toast('발주가 완료되고 재고 및 기록이 저장되었습니다.');});
   let historyPage=1;const HIST_SIZE=10;
   // 기록 날짜(예: 2026. 11. 11.)에서 '2026-11' 꺼내기
   // 날짜 뒤에 요일 붙이기 (예: 2026. 11. 11. (수))
   function dateWithDay(r){const m=String(r.date).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);if(!m)return r.date;
     const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]));return `${r.date} (${'일월화수목금토'[d.getDay()]})`;}
   function monthKey(r){const m=String(r.date).match(/(\d{4})\D+(\d{1,2})/);return m?`${m[1]}-${m[2].padStart(2,'0')}`:'';}
-  function renderMonthOptions(){const sel=$('histMonth'),cur=sel.value||'all';
+  function renderMonthOptions(){const hid=$('histMonth'),cur=hid.value||'all';
     const months=[...new Set(state.history.map(monthKey).filter(Boolean))].sort().reverse();
-    sel.innerHTML='<option value="all">전체</option>'+months.map(k=>{const [y,m]=k.split('-');return `<option value="${k}">${y}년 ${Number(m)}월</option>`;}).join('');
-    sel.value=months.includes(cur)?cur:'all';}
-  $('histMonth').addEventListener('change',()=>{historyPage=1;renderHistory();});
+    const v=months.includes(cur)?cur:'all';hid.value=v;
+    const label=k=>{if(k==='all')return '전체';const [y,m]=k.split('-');return `${y}년 ${Number(m)}월`;};
+    $('histMonthBtn').textContent=label(v);
+    document.querySelector('#histMonthDD .dd-list').innerHTML=['all',...months].map(k=>`<li role="option" tabindex="0" class="dd-opt${k===v?' selected':''}" data-month="${k}" aria-selected="${k===v}"><span>${label(k)}</span></li>`).join('');}
+  (()=>{const wrap=$('histMonthDD'),btn=$('histMonthBtn'),list=wrap.querySelector('.dd-list');
+    btn.addEventListener('click',()=>{const open=list.hidden;closeDropdowns(wrap);list.hidden=!open;btn.setAttribute('aria-expanded',String(open));});
+    list.addEventListener('click',e=>{const li=e.target.closest('[data-month]');if(!li)return;list.hidden=true;btn.setAttribute('aria-expanded','false');$('histMonth').value=li.dataset.month;historyPage=1;renderHistory();btn.focus();});
+    list.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset.month){e.preventDefault();e.target.click();}});})();
   function renderHistory(){
     renderMonthOptions();const month=$('histMonth').value;
     const list=(month==='all'?state.history:state.history.filter(r=>monthKey(r)===month)).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
