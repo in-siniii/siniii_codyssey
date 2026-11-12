@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>매장 재고·발주 관리</title>
+<style>
+:root{--ink:#202522;--muted:#78817b;--line:#e5e9e6;--bg:#f5f7f5;--green:#276b4b;--green2:#e8f2ec;--red:#b83b3b;--redbg:#fff0ef;--white:#fff;--shadow:0 2px 12px #1b33200a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:14px}button,input,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:9px 13px;font-weight:600}button:hover{filter:brightness(.97)}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:var(--green);border-color:var(--green);color:#fff}.soft{background:var(--green2);border-color:#d5e6db;color:var(--green)}.danger{color:var(--red);border-color:#f0d5d3;background:#fff}.save-btn{background:#e9ecea;border-color:#e9ecea;color:#555;padding:10px 20px}.app{max-width:1180px;margin:0 auto;padding:28px 28px 60px}[hidden]{display:none!important}.top{margin-bottom:25px}.brand{min-width:0}.top-bar{display:flex;align-items:center;justify-content:flex-end;gap:32px;margin-top:16px}.title{display:flex;align-items:center;flex-wrap:wrap;gap:6px}.store-name-btn{border:0;background:transparent;padding:0 2px;font-size:inherit;font-weight:800;letter-spacing:inherit;color:var(--green);border-radius:6px}.store-name-btn:hover{background:var(--green2);filter:none}#storeNameInput{font-size:22px;font-weight:700;width:9em;padding:6px 10px}.store-actions{display:inline-flex;gap:5px}.store-actions button{padding:6px 11px;font-size:13px;letter-spacing:0}.brand h1{font-size:30px;margin:0;font-weight:800;letter-spacing:-.8px}.brand p{margin:5px 0 0;color:var(--muted);font-size:12px}.nav{display:flex;gap:6px;align-items:center}.nav button{border:0;background:transparent;color:#69736d;padding:11px 14px;white-space:nowrap}.nav button.active{background:var(--green);color:#fff}.nav .count{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;padding:0 5px;margin-left:4px;background:#d94b45;color:white;border-radius:20px;font-size:11px}.panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:46px;box-shadow:var(--shadow)}.view{display:none}.view.active{display:block}.section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}.section-head h2{font-size:19px;margin:0 0 5px;letter-spacing:-.5px}.section-head p{margin:0;color:var(--muted);font-size:13px}.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:17px}.search{position:relative;flex:1;min-width:180px}.search input{width:100%;padding:11px 13px 11px 36px}.search:before{content:'⌕';position:absolute;left:13px;top:7px;font-size:22px;color:#8b958e}input,select{border:1px solid #dce2dd;border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink);min-width:0}input:focus,select:focus{outline:2px solid #c9e0d1;border-color:#75a98a}.view-switch{display:flex;gap:4px;background:#f1f4f1;border-radius:10px;padding:4px}.view-switch button{border:0;background:transparent;padding:8px 11px;color:#6d7770}.view-switch button.active{background:#fff;color:var(--green);box-shadow:0 1px 4px #0000000d}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;white-space:nowrap}th{text-align:left;color:#7a847e;font-size:12px;font-weight:600;background:#fafbfa;padding:12px 14px;border-bottom:1px solid var(--line)}td{padding:13px 14px;border-bottom:1px solid #edf0ed;vertical-align:middle}th.name-cell,td.name-cell{padding-left:28px}td.group-cell{padding-left:24px}tbody tr:last-child td{border-bottom:0}.stock-row.low{background:#fff8f7}.stock-row.low td.name-cell{border-left:3px solid #d95a53}td.group-cell{background:#f5f8f5!important;color:var(--green);font-weight:800;vertical-align:top;border-right:1px solid var(--line);white-space:normal;min-width:110px}td.group-cell .pill{display:table;margin:6px 0 0}.card-group-title{padding:9px 12px;margin:14px 0 8px;background:#f5f8f5;color:var(--green);font-weight:800;border-radius:9px}.card-group-title:first-child{margin-top:0}.pagination{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;margin-top:18px}.page-btn{min-width:38px;height:38px;padding:0 8px;font-weight:600}.page-btn.active{background:var(--green);border-color:var(--green);color:#fff}.item-name{font-weight:700}.sub{font-size:12px;color:var(--muted);margin-top:4px}.qty{font-weight:700;font-variant-numeric:tabular-nums}.low-text{color:var(--red)}.stepper{display:flex;align-items:center;justify-content:flex-end;gap:6px}.stepper button{width:31px;height:30px;padding:0;font-size:17px;line-height:1}.stepper span{min-width:38px;text-align:center;font-weight:700}.qty-lines{display:flex;flex-direction:column;gap:7px;min-width:70px}table .qty-line{height:30px}td.step-cell .stepper{justify-content:flex-start}.stock-row td{vertical-align:top;padding-top:18px}.stock-row td.qty-cell,.stock-row td.step-cell{padding-top:13px}.stock-row td.group-cell{padding-top:18px}.stock-row .actions{margin-top:-5px}.qty-line{display:flex;align-items:center;justify-content:space-between;gap:8px}.qty-line .stepper{gap:4px}.qty-line .stepper button{width:27px;height:27px}.total-small{font-size:11px;color:#7c867f;margin-top:2px}.actions{display:flex;gap:5px}.actions button{padding:7px 9px;font-size:12px}.group-title{padding:13px 10px;background:#f5f8f5;color:var(--green);font-weight:800;border-bottom:1px solid var(--line)}.empty{padding:54px 15px;text-align:center;color:#8a948d}.empty strong{display:block;color:#49544d;font-size:15px;margin-bottom:7px}.cards{display:none}.stock-card{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;gap:12px}.stock-card.low{background:var(--redbg);border-color:#f1d3d1}.card-main{min-width:0;flex:1}.card-main .item-name{font-size:16px}.card-meta{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.6}.card-qty{font-size:19px;font-weight:800;margin-top:7px}.card-controls{display:flex;flex-direction:column;justify-content:center;gap:7px;min-width:105px}.card-controls .qty-line{gap:4px}.card-controls .stepper{gap:4px}.card-controls .stepper span{min-width:22px}.card-actions{display:flex;gap:5px;margin-top:9px}.form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px 14px}.field label{display:block;font-size:12px;font-weight:700;color:#667169;margin-bottom:7px}.field input,.field select{width:100%}.field small{display:block;color:#89938c;font-size:11px;margin-top:6px}.unit-row{display:flex;gap:7px;align-items:center}.unit-row select{flex:1}.unit-row{margin-top:7px}.unit-row input{width:100%}.dd{position:relative}.dd-btn{width:100%;text-align:left;font-weight:400;border:1px solid #dce2dd;border-radius:9px;padding:10px 34px 10px 11px;background:#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2378817b'/%3E%3C/svg%3E") no-repeat right 12px center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dd-btn:hover{filter:none;border-color:#c5cec8}.dd-btn.placeholder{color:#8b958e}.dd-btn[aria-expanded="true"]{outline:2px solid #c9e0d1;border-color:#75a98a}.dd-list{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:6;margin:0;padding:4px;list-style:none;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px #0000001a;max-height:250px;overflow-y:auto}.dd-opt{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:7px;cursor:pointer;min-height:36px}.dd-opt:hover,.dd-opt:focus{background:var(--green2);outline:none}.dd-opt.selected{color:var(--green);font-weight:700}.dd-del{border:0;background:transparent;padding:2px 4px;font-size:13px;line-height:1;color:#c4cbc6;font-weight:400;border-radius:4px}.dd-del:hover{color:var(--red);filter:none}.form-grid .row-start{grid-column-start:1}.pair{display:grid;gap:0 10px}.pair.two{grid-template-columns:1fr 1fr}.modal{max-height:calc(100vh - 36px);overflow-y:auto}.form-bottom{display:flex;align-items:center;justify-content:flex-end;gap:13px;margin-top:23px}.notice{font-size:12px;color:var(--muted)}.notice.error{color:var(--red)}.order-list{display:flex;flex-direction:column;gap:10px}.order-item{border:1px solid #f0d9d7;background:#fffafa;border-radius:11px;padding:15px 22px 15px 56px;display:grid;grid-template-columns:minmax(0,340px) auto minmax(150px,1fr) auto;gap:12px 40px;align-items:start}.order-item h3{margin-top:3px}.order-remove{margin-top:4px}.order-remove{justify-self:end}.order-note input{width:100%}.note-add{border:0;background:transparent;color:#8a948d;font-weight:600;font-size:12px;padding:9px 2px}.note-add:hover{color:var(--green);filter:none}.order-memo{margin-top:20px}.order-memo label{display:block;font-size:12px;font-weight:700;color:#667169;margin-bottom:7px}.order-memo textarea{width:100%;min-height:72px;resize:vertical;border:1px solid #dce2dd;border-radius:9px;padding:10px 11px;font:inherit;color:var(--ink)}.order-memo textarea:focus{outline:2px solid #c9e0d1;border-color:#75a98a}.order-group{display:grid;grid-template-columns:150px minmax(0,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden}.order-group-name{background:#f5f8f5;color:var(--green);font-weight:800;padding:18px 16px 18px 22px;border-right:1px solid var(--line);overflow-wrap:anywhere}.order-group-name .pill{display:table;margin:6px 0 0}.order-group-items{display:flex;flex-direction:column;gap:10px;padding:10px}.order-item.need{border-left:4px solid #d95a53}.order-item.manual{border-color:#d5e6db;background:#f6fbf8;border-left:4px solid var(--green)}.manual-pill{background:var(--green2);color:var(--green)}.remove-manual{padding:6px 11px;font-size:12px;color:#637068;background:#fff;white-space:nowrap}.order-toolbar{align-items:flex-end;margin-bottom:18px}.order-toolbar .order-add{flex:1;min-width:200px;margin-bottom:0}.order-add{margin-bottom:18px}.order-add label{display:block;font-size:12px;font-weight:700;color:#667169;margin-bottom:7px}.add-wrap{position:relative;max-width:420px}.add-wrap input{width:100%}.dd-opt small{color:var(--muted);font-size:11px;font-weight:400;text-align:right}.dd-empty{padding:10px;color:var(--muted)}.order-item h3{margin:0 0 5px;font-size:15px}.order-item .detail{font-size:12px;color:var(--muted)}.order-amount{display:flex;align-items:flex-start;gap:10px;justify-content:flex-start}.oa-label{font-size:13px;font-weight:600;padding-top:10px;white-space:nowrap}.oa-inputs{display:flex;flex-direction:column;gap:6px}.oa-row{display:grid;grid-template-columns:90px 3.6em;gap:7px;align-items:center}.order-amount input{width:100%;text-align:right;font-weight:700}.oa-unit{text-align:left;overflow-wrap:anywhere}.oa-total{font-size:12px;color:var(--green);text-align:right;padding-right:calc(3.6em + 7px)}.order-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}.buyer{display:flex;flex-direction:column;gap:7px;min-width:220px}.buyer label{font-size:12px;font-weight:700;color:#667169}.buyer input{width:100%}.order-actions{display:flex;align-items:center;gap:12px}.history-card{border:1px solid var(--line);border-radius:11px;padding:16px;margin-bottom:10px}.history-top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}.history-top strong{font-size:14px}.history-top time{font-size:12px;color:var(--muted)}.history-items{color:#59645d;font-size:13px;line-height:1.8}.pill{display:inline-block;background:#f0f4f1;color:#637068;padding:3px 8px;border-radius:20px;font-size:11px;margin-left:5px}.modal-backdrop{position:fixed;inset:0;background:#17251d66;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal-backdrop.open{display:flex}.modal{background:white;border-radius:15px;padding:22px;width:min(420px,100%);box-shadow:0 15px 50px #0002}.modal h3{margin:0 0 17px}.modal .field{margin-bottom:14px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%) translateY(20px);background:#26372d;color:white;padding:12px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:.2s;z-index:20;box-shadow:0 5px 20px #0002}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.hint{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px}
+@media(max-width:800px){.app{padding:18px 15px 40px}.top{margin-bottom:17px}.brand h1{font-size:25px}.top-bar{gap:20px;margin-top:12px}.nav{overflow-x:auto;gap:2px}.nav button{padding:10px 12px;font-size:13px}.panel{padding:32px}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.table-wrap{display:none}.cards{display:block}.section-head{margin-bottom:14px}.order-item{grid-template-columns:minmax(0,1fr) auto;padding:14px 16px 14px 20px;gap:12px 24px}.order-group{grid-template-columns:1fr}.order-group-name{border-right:0;border-bottom:1px solid var(--line);padding:10px 14px}.order-group-name .pill{display:inline-block;margin:0 0 0 5px}.order-remove{grid-column:1/-1}.order-note{grid-column:1/-1}}
+@media(max-width:480px){body{font-size:13px}.app{padding:14px 11px 35px}.brand h1{font-size:21px}.brand p{font-size:11px}.top-bar{flex-direction:column;align-items:stretch;gap:8px}.top-right{align-self:flex-end}.nav{overflow:visible;display:grid;grid-template-columns:repeat(4,1fr);gap:3px}#storeNameInput{font-size:17px;width:8em}.page-btn{min-width:36px;height:40px}.nav button{padding:10px 3px;font-size:11px}.save-btn{padding:9px 13px;font-size:12px}.panel{padding:22px;border-radius:12px}.section-head h2{font-size:17px}.section-head p{font-size:11px}.toolbar{gap:7px}.search{flex-basis:100%}.view-switch{width:100%;justify-content:space-between}.view-switch button{flex:1;padding:8px 4px;font-size:11px}.stock-card{padding:12px 10px;gap:8px}.card-main .item-name{font-size:14px}.card-qty{font-size:17px}.card-controls{min-width:98px}.card-controls .stepper span{font-size:12px}.card-controls .stepper button{width:27px;height:28px}.card-meta{font-size:11px}.form-grid{grid-template-columns:1fr;gap:13px}.form-bottom{align-items:stretch;flex-direction:column-reverse}.form-bottom button{width:100%;padding:12px}.notice{text-align:right}.order-item{grid-template-columns:1fr;gap:12px;padding:13px}.order-amount{justify-content:flex-start}.add-wrap{max-width:none}.order-bottom{align-items:stretch;flex-direction:column}.buyer{min-width:0}.order-actions{justify-content:space-between}.order-actions button{flex:1}.history-top{align-items:flex-start;flex-direction:column;gap:4px}.dd-del{padding:6px 9px}}
+.hist-wrap{overflow-x:auto}table.hist td{vertical-align:top}table.hist td.hist-items{white-space:normal;min-width:300px}
+.hist-sup{display:flex;gap:12px;align-items:flex-start;padding:2px 0}.hist-sup+.hist-sup{border-top:1px dashed var(--line);padding-top:8px;margin-top:6px}
+.hist-sup ul{margin:0;padding:0;list-style:none;line-height:1.75;flex:1;min-width:0}.hist-sup li{display:flex;justify-content:space-between;gap:18px}.hist-note{color:#8a6d3b;font-size:12px;text-align:right}table.hist tr.has-memo td:not(.hist-items){border-bottom:0}table.hist td.hist-memo{white-space:normal;padding-top:0;font-size:12px;color:#59645d;max-width:340px}.hist-memo strong{display:block;color:var(--muted);margin-bottom:2px}.sup-pill{margin-left:0;flex-shrink:0;min-width:88px;text-align:center;margin-top:2px}
+@media(max-width:800px){table.hist thead{display:none}table.hist,table.hist tbody,table.hist tr,table.hist td{display:block;width:100%}table.hist tr{border:1px solid var(--line);border-radius:11px;margin-bottom:10px;padding:8px 4px}table.hist td{border:0;padding:4px 12px;white-space:normal;min-width:0}table.hist td::before{content:attr(data-label);display:inline-block;min-width:72px;font-weight:700;color:var(--muted);font-size:12px}table.hist td.hist-items::before{display:block;margin-bottom:5px}table.hist tr.has-memo{margin-bottom:0;border-bottom:0;border-radius:11px 11px 0 0}table.hist tr.memo-row{border-top:0;border-radius:0 0 11px 11px;padding-top:0}table.hist td.hist-memo{max-width:none;font-size:13px}table.hist td.hist-memo::before{content:none}.hist-sup li{flex-direction:column;gap:0}.hist-note{text-align:left}.hist-sup{flex-direction:column;gap:4px}}
+table.hist{white-space:normal}table.hist th{white-space:nowrap}table.hist td{border-bottom:1px solid #f1f3f1}
+tbody.hist-rec{border:1px solid #d3dcd6;border-top:2px solid #aebdb3;border-bottom:2px solid #aebdb3}tbody.hist-gap td{height:14px;padding:0;border:0!important;background:transparent}tbody.hist-rec tr:first-child td{border-top:2px solid #aebdb3}tbody.hist-rec tr:last-child td{border-bottom:2px solid #aebdb3}table.hist thead th{border-bottom:1px solid #d3dcd6}
+table.hist td.h-sup{color:var(--green);font-weight:700;white-space:nowrap}table.hist td.h-item{white-space:nowrap}table.hist td.h-note{color:#8a6d3b;min-width:160px}
+table.hist tr.memo-row td{background:transparent;color:#4f5a53;padding:10px 14px;border-top:1px dashed #d3dcd6;border-bottom:0}.memo-label{display:inline-block;font-size:11px;font-weight:700;color:var(--green);background:var(--green2);border-radius:20px;padding:2px 9px;margin-right:10px}
+.hist-cards{display:none}.hist-card{border:1px solid var(--line);border-radius:11px;padding:14px;margin-bottom:10px}.hist-card-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}.hist-card-top span{color:var(--muted);font-size:12px}
+.hist-card-memo{margin-top:10px;padding:9px 0 0;background:transparent;border-top:1px dashed var(--line);color:#4f5a53;font-size:13px}
+@media(max-width:800px){.hist-wrap{display:none}.hist-cards{display:block}}
+.hist-filter{display:flex;align-items:center;gap:8px;flex-shrink:0}.hist-filter label{font-size:12px;font-weight:700;color:#667169}.hist-filter .dd{min-width:150px}
+.memo-empty{color:#a3aca6}
+tbody.hist-rec.latest{background:#f1f7f3}.hist-card.latest{background:#f1f7f3;border-color:#cfe2d6}.latest-pill{display:table;margin:6px 0 0;background:var(--green);color:#fff}.hist-card-top .latest-pill{display:inline-block;margin:0 0 0 6px}tbody.hist-rec tr:first-child td{padding-top:28px}.hist-card{padding-top:24px}
+/* ===== ver27 ===== */
+.group-filter{min-width:170px}
+/* 재고 카드(휴대폰) */
+.stock-card{display:block}.sc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.sc-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-top:6px}
+.stock-card .card-meta{margin-top:0;line-height:1.55}.stock-card .card-actions{margin-top:0;flex-shrink:0}.stock-card .card-actions button{padding:4px 8px;font-size:11px;border-radius:7px}
+.low-badge{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:20px;background:#fbe1df;color:var(--red);font-size:10px;font-weight:700;vertical-align:2px}
+.card-controls{min-width:0;gap:5px;align-items:flex-end}.card-controls .stepper .sv{display:inline-flex;align-items:baseline;justify-content:center;gap:1px;min-width:50px}
+.sv b{font-weight:800;font-variant-numeric:tabular-nums}.sv small{font-size:11px;color:var(--muted);font-weight:600}.stock-card.low .sv b{color:var(--red)}
+/* 모달 */
+.modal.wide{width:min(560px,100%)}.modal-sub{margin:-10px 0 14px;color:var(--muted);font-size:12px}.modal .hint{margin-top:4px}
+.ta{width:100%;min-height:72px;resize:vertical;border:1px solid #dce2dd;border-radius:9px;padding:10px 11px;font:inherit;color:var(--ink);line-height:1.6}.ta:focus{outline:2px solid #c9e0d1;border-color:#75a98a}
+.confirm-sum{background:#f5f8f5;border-radius:10px;padding:11px 13px;line-height:1.8;margin-bottom:8px}.confirm-sum b{color:var(--muted);font-weight:700;margin-right:4px}.cs-sups{color:var(--green);font-weight:600}
+.msg-block{border:1px solid var(--line);border-radius:11px;padding:10px;margin-bottom:10px}.msg-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:7px}.msg-head strong{color:var(--green)}.msg-head button{padding:6px 12px;font-size:12px}.msg-block .ta{min-height:170px}
+.he-item{border:1px solid var(--line);border-radius:10px;padding:10px 11px;margin-bottom:8px}.he-head{display:flex;align-items:center;gap:4px;flex-wrap:wrap}.he-head .pill{margin-left:2px}
+.he-qty{display:flex;align-items:center;gap:5px 6px;flex-wrap:wrap;margin:7px 0}.he-qty input{width:64px;text-align:right;font-weight:700;padding:7px 8px}.he-qty span{margin-right:6px}.he-note{width:100%;padding:7px 9px}
+.notice.error:empty{display:none}#heMsg{text-align:right;margin-top:8px}
+/* 발주 기록: 수정·문자 */
+.hist-actions{display:flex;gap:5px;flex-shrink:0}.hist-actions button{padding:4px 9px;font-size:11px;border-radius:7px}
+.edited-pill{background:#fff4dc;color:#8a6d3b;margin-left:5px}.hist-card-top .edited-pill{color:#8a6d3b;font-size:10px}
+.hist-card-top{flex-wrap:nowrap;align-items:flex-start}.hc-date{color:var(--muted);font-size:12px;margin-top:2px}
+.edit-label{background:#fff4dc;color:#8a6d3b}.edit-log{list-style:none;margin:6px 0 0;padding:0;font-size:12px;color:#5d6861;line-height:1.65}.edit-log li+li{margin-top:6px}.el-head{font-weight:700;color:#8a6d3b}
+.hist-card-edits{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line)}
+table.hist tr.edit-row td{border-top:1px dashed #d3dcd6}
+/* 휴대폰 화면 */
+@media(max-width:800px){.toolbar .group-filter{flex:1}}
+@media(max-width:480px){
+  body{font-size:12px}button{padding:8px 11px}input,select{padding:9px 10px}
+  .brand h1{font-size:18px}.brand p{font-size:10.5px}#storeNameInput{font-size:15px}.store-actions button{padding:5px 9px;font-size:11px}
+  .nav button{padding:9px 2px;font-size:11px}.nav .count{min-width:16px;height:16px;font-size:10px;margin-left:2px}.save-btn{padding:7px 12px;font-size:11px}
+  .panel{padding:16px 12px}.section-head h2{font-size:15px}.section-head p{font-size:10.5px;line-height:1.5}
+  .search input{padding:9px 11px 9px 31px}.search:before{top:50%;left:10px;transform:translateY(-54%);font-size:18px;line-height:1}
+  .view-switch button{padding:7px 3px;font-size:11px}.group-filter{flex-basis:100%}.dd-btn{padding:9px 30px 9px 10px}.dd-opt{min-height:32px;padding:7px 9px}
+  .card-group-title{padding:7px 10px;font-size:12px}.pill{font-size:10px;padding:2px 7px}
+  .stock-card{padding:10px 11px;margin-bottom:8px}.stock-card .item-name{font-size:13px}.stock-card .card-meta{font-size:10.5px}
+  .card-controls .stepper button{width:26px;height:26px;font-size:15px}.card-controls .stepper .sv b{font-size:13px}.sv small{font-size:10px}
+  .pagination{flex-wrap:nowrap;gap:3px;margin-top:14px}.page-btn{min-width:29px;height:31px;padding:0 3px;font-size:12px;border-radius:7px}
+  .field label,.buyer label,.order-memo label,.order-add label{font-size:11px}.field small{font-size:10px}
+  .order-list{gap:8px}.order-group-items{padding:8px;gap:8px}.order-group-name{padding:8px 12px;font-size:12px}
+  .order-item{position:relative;padding:10px 11px;gap:7px}.order-item h3{font-size:13px;padding-right:62px;margin:0 0 3px}.order-item .detail{font-size:10.5px;line-height:1.5}
+  .order-remove{position:absolute;top:8px;right:8px;margin:0}.remove-manual{padding:3px 7px;font-size:10px;border-radius:6px;font-weight:600}
+  .order-amount{align-items:center;gap:8px;flex-wrap:wrap}.oa-label{padding-top:0;font-size:11px;color:var(--muted)}
+  .oa-inputs{flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 10px}.oa-row{grid-template-columns:50px auto;gap:4px}.order-amount input{padding:6px 7px}.oa-unit{white-space:nowrap}.oa-total{padding-right:0;font-size:10.5px}
+  .note-add{padding:0 2px;font-size:11px}.order-note input{padding:7px 9px}.order-memo{margin-top:14px}.order-memo textarea{min-height:60px}
+  .order-bottom{margin-top:14px;padding-top:14px}.form-bottom button,.order-actions button{padding:11px}
+  .modal{padding:16px 14px;border-radius:13px}.modal h3{font-size:15px;margin-bottom:14px}.modal-backdrop{padding:10px}.msg-block .ta{min-height:150px}
+  .hist-card{padding:12px}.hist-card-top strong{font-size:13px}.hc-date{font-size:11px}.hist-sup ul{line-height:1.65}.hist-card-memo{font-size:12px}.edit-log{font-size:11px}
+  .toast{font-size:12px;padding:10px 15px;max-width:calc(100% - 30px)}
+}
+/* ===== ver28 ===== */
+.ofilter-hint{font-size:11px;color:var(--muted);background:#f5f8f5;border-radius:8px;padding:7px 10px}
+.edit-toggle{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 10px;background:#fffaf0;border:1px solid #f0e2c4;color:#8a6d3b;font-size:12px;border-radius:9px}
+.edit-toggle .et-count{background:#fff4dc;border-radius:20px;padding:1px 7px;font-size:10.5px}.edit-toggle .et-arrow{font-size:9px}
+.hist-card-edits .edit-log{margin-top:9px;padding:0 2px}
+@media(max-width:800px){.hist-sup li{display:block}.hist-sup li .hist-note{display:inline;margin-left:6px;text-align:left;font-weight:600}}
+@media(max-width:480px){.order-item h3{margin:0 0 9px;min-height:22px}.hist-card-edits{padding-top:10px}}
+/* ===== ver29 ===== */
+@media(max-width:800px){
+  /* 특이사항: 거래처마다 같은 세로선에서 시작 */
+  .hist-sup ul{display:grid;grid-template-columns:minmax(0,max-content) minmax(0,1fr);column-gap:12px}
+  .hist-sup li{display:contents}
+  .hist-sup li .hist-note{display:block;margin-left:0;font-weight:400;font-size:11px;color:#a08a5c;line-height:inherit;padding-top:1px}
+  /* 수정·수정됨: 동그라미 없이 글씨만 */
+  .edited-pill,.hist-card-top .edited-pill{background:transparent;padding:0;border-radius:0;margin-left:6px;font-size:10.5px;color:#a08a5c;font-weight:600}
+}
+/* ===== ver30: 휴대폰 발주 기록 카드 다시 정리 ===== */
+.hist-card{background:#fff}.hist-card.latest{background:#fff;border:1.5px solid #9cc5ad}
+.hc-edited{margin-left:7px;font-size:10.5px;font-weight:600;color:#b07d1e}.hc-edited::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#e0a93b;margin-right:4px;vertical-align:1px}
+.hc-sup{margin-top:12px}
+.hc-sup-head{display:flex;justify-content:space-between;align-items:center;background:#eef6f1;border-left:3px solid var(--green);border-radius:6px;padding:6px 10px;color:var(--green);font-weight:800;font-size:13px}
+.hc-sup-head small{color:#6f8a7a;font-weight:600;font-size:10.5px}
+.hc-items{list-style:none;margin:2px 0 0;padding:0}
+.hc-items li{position:relative;padding:7px 2px 7px 13px;border-bottom:1px solid #f0f2f0}.hc-items li:last-child{border-bottom:0}
+.hc-items li.edited::before{content:'';position:absolute;left:2px;top:13px;width:6px;height:6px;border-radius:50%;background:#e0a93b}
+.hc-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.hc-name{min-width:0;overflow-wrap:anywhere}
+.hc-qty{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right}.hc-qty small{display:block;font-size:10px;font-weight:500;color:var(--muted)}
+.hc-note{margin-top:-2px;padding-left:8px;font-size:9px;color:#9a8b6e;line-height:1.3}.hc-note::before{content:'- '}
+.hist-card-memo{margin-top:12px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><h1 class="title"><button type="button" class="store-name-btn" id="storeNameBtn" title="눌러서 매장 이름 바꾸기"><span id="storeNameText">매장</span></button><input id="storeNameInput" maxlength="12" placeholder="매장 이름" aria-label="매장 이름" hidden /><span>재고·발주 관리</span><span class="store-actions" id="storeActions" hidden><button type="button" class="primary" id="storeOk">확인</button><button type="button" id="storeCancel">취소</button></span></h1><p>재고를 확인하고 필요한 품목을 발주하세요.</p></div>
+    <div class="top-bar">
+    <nav class="nav" aria-label="주 메뉴">
+      <button class="active" data-view="inventory">재고 목록</button>
+      <button data-view="orders">발주 목록 <span id="needCount"></span></button>
+      <button data-view="history">발주 기록</button>
+      <button data-view="register">품목 등록</button>
+    </nav>
+    <div class="top-right" id="saveArea"><button class="save-btn" id="saveBtn">저장</button></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="view active panel" id="view-inventory">
+      <div class="section-head"><div><h2>재고 목록</h2><p>현재 보유한 품목과 수량을 확인하고 관리합니다.</p></div></div>
+      <div class="toolbar">
+        <div class="search"><input id="searchInput" type="search" placeholder="품목명 검색" autocomplete="off" /></div>
+        <div class="view-switch" aria-label="보기 방식"><button class="active" data-mode="all">전체 보기</button><button data-mode="supplier">거래처별 보기</button><button data-mode="category">분류별 보기</button></div>
+        <div class="dd group-filter" id="groupFilterDD" hidden><button type="button" class="dd-btn" id="groupFilterBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="거래처 또는 분류 선택">전체</button><ul class="dd-list" role="listbox" hidden></ul></div>
+      </div>
+      <div id="inventoryTable" class="table-wrap"></div><div id="inventoryCards" class="cards"></div>
+      <div class="pagination" id="pagination" aria-label="페이지 이동"></div>
+    </section>
+
+    <section class="view panel" id="view-register">
+      <div class="section-head"><div><h2>품목 등록</h2><p>새로 관리할 식재료 또는 공산품 정보를 입력하세요.</p></div></div>
+      <form id="registerForm" novalidate>
+        <div class="form-grid">
+          <div class="field"><label for="itemName">품목명 *</label><input id="itemName" placeholder="예: 양파" autocomplete="off" /></div>
+          <div class="field"><label for="categoryBtn">분류 *</label><div class="dd" data-for="category"><button type="button" class="dd-btn" id="categoryBtn" aria-haspopup="listbox" aria-expanded="false">분류 선택</button><ul class="dd-list" role="listbox" hidden></ul></div><input type="hidden" id="category" value="" /><div class="unit-row" id="categoryCustomWrap" hidden><input id="categoryCustom" placeholder="분류 직접 입력" /></div></div>
+          <div class="field"><label for="supplierSelectBtn">거래처 *</label><div class="dd" data-for="supplierSelect"><button type="button" class="dd-btn placeholder" id="supplierSelectBtn" aria-haspopup="listbox" aria-expanded="false">거래처 선택</button><ul class="dd-list" role="listbox" hidden></ul></div><input type="hidden" id="supplierSelect" value="" /><div class="unit-row" id="supplierCustomWrap" hidden><input id="supplier" placeholder="거래처 직접 입력" autocomplete="off" /></div></div>
+          <div class="field"><label for="bundleUnitBtn">묶음 단위</label><div class="dd" data-for="bundleUnit"><button type="button" class="dd-btn" id="bundleUnitBtn" aria-haspopup="listbox" aria-expanded="false">없음</button><ul class="dd-list" role="listbox" hidden></ul></div><input type="hidden" id="bundleUnit" value="" /><div class="unit-row" id="bundleCustomWrap" hidden><input id="bundleCustom" placeholder="묶음 단위 직접 입력" /></div></div>
+          <div class="field"><label for="eachUnitBtn">낱개 단위 *</label><div class="dd" data-for="eachUnit"><button type="button" class="dd-btn" id="eachUnitBtn" aria-haspopup="listbox" aria-expanded="false">단위 선택</button><ul class="dd-list" role="listbox" hidden></ul></div><input type="hidden" id="eachUnit" value="" /><div class="unit-row" id="eachCustomWrap" hidden><input id="eachCustom" placeholder="낱개 단위 직접 입력" /></div></div>
+          <div class="field bundle-only" hidden><label for="bundleSize" id="bundleSizeLabel">묶음당 낱개 수 *</label><input id="bundleSize" class="num-input" inputmode="numeric" placeholder="예: 30" /></div>
+          <div class="field bundle-only row-start" id="requiredBundleField" hidden><label for="requiredBundleQty" id="requiredBundleLabel">필요 묶음 수량 *</label><input id="requiredBundleQty" class="num-input" inputmode="numeric" placeholder="예: 3" /></div>
+          <div class="field" id="requiredField"><label for="requiredQty" id="requiredLabel">필요 수량 *</label><input id="requiredQty" class="num-input" data-decimal="1" inputmode="decimal" placeholder="예: 10" /></div>
+          <div class="field bundle-only row-start" id="bundleQtyField" hidden><label for="bundleQty" id="bundleQtyLabel">현재 묶음 수량 *</label><input id="bundleQty" class="num-input" inputmode="numeric" placeholder="예: 2" /></div>
+          <div class="field" id="eachQtyField"><label for="eachQty" id="eachQtyLabel">현재 수량 *</label><input id="eachQty" class="num-input" data-decimal="1" inputmode="decimal" placeholder="예: 5" /></div>
+        </div>
+        <div class="form-bottom"><span class="notice" id="registerMessage">* 표시된 항목을 모두 입력해 주세요.</span><button class="primary" type="submit">등록</button></div>
+      </form>
+    </section>
+
+    <section class="view panel" id="view-orders">
+      <div class="section-head"><div><h2>발주 목록</h2><p>필요 수량보다 재고가 적은 품목이 자동으로 담깁니다. 다른 품목도 직접 추가할 수 있고, 발주 수량은 고칠 수 있습니다.</p></div></div>
+      <div class="toolbar order-toolbar"><div class="order-add"><label for="orderAddInput">발주 품목 직접 추가</label><div class="add-wrap"><input id="orderAddInput" placeholder="추가할 품목명 검색" autocomplete="off" /><ul class="dd-list" id="orderAddList" role="listbox" hidden></ul></div></div><div class="view-switch" aria-label="발주 목록 보기 방식"><button class="active" data-omode="all">전체 보기</button><button data-omode="supplier">거래처별 보기</button><button data-omode="category">분류별 보기</button></div><div class="dd group-filter" id="orderFilterDD" hidden><button type="button" class="dd-btn" id="orderFilterBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="거래처 또는 분류 선택">전체</button><ul class="dd-list" role="listbox" hidden></ul></div></div>
+      <div id="orderList" class="order-list"></div>
+      <div class="order-memo" id="orderMemoWrap" hidden><label for="orderMemo">메모</label><textarea id="orderMemo" maxlength="300" placeholder="예: 다음 주 화요일 오전 배송 요청"></textarea></div>
+      <div class="order-bottom" id="orderBottom" hidden>
+        <div class="buyer"><label for="buyerSelectBtn">발주자 이름 *</label><div class="dd" data-for="buyerSelect"><button type="button" class="dd-btn placeholder" id="buyerSelectBtn" aria-haspopup="listbox" aria-expanded="false">발주자 선택</button><ul class="dd-list" role="listbox" hidden></ul></div><input type="hidden" id="buyerSelect" value="" /><div class="unit-row" id="buyerCustomWrap" hidden><input id="buyerName" placeholder="발주자 이름 직접 입력" autocomplete="off" /></div></div>
+        <div class="order-actions"><span class="notice" id="orderMessage"></span><button class="primary" id="completeOrder">발주 확정</button></div>
+      </div>
+    </section>
+
+    <section class="view panel" id="view-history">
+      <div class="section-head"><div><h2>발주 기록</h2><p>완료한 발주 내역을 최근 순서대로 확인합니다.</p></div><div class="hist-filter"><div class="dd" id="histMonthDD"><button type="button" class="dd-btn" id="histMonthBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="월 선택">전체</button><ul class="dd-list" role="listbox" hidden></ul></div><input type="hidden" id="histMonth" value="all" /></div></div>
+      <div id="historyList"></div>
+      <div class="pagination" id="historyPagination" aria-label="발주 기록 페이지 이동"></div>
+    </section>
+  </main>
+</div>
+<div class="modal-backdrop" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+  <div class="modal"><h3 id="editTitle">품목 수정</h3><div class="field bundle-only"><label for="editBundleSize" id="editBundleSizeLabel">묶음당 낱개 수</label><input id="editBundleSize" class="num-input" inputmode="numeric" /></div><div class="pair" id="editReqPair"><div class="field bundle-only"><label for="editRequiredBundle" id="editReqBundleLabel">필요 묶음 수량</label><input id="editRequiredBundle" class="num-input" inputmode="numeric" /></div><div class="field"><label for="editRequired" id="editRequiredLabel">필요 수량</label><input id="editRequired" class="num-input" data-decimal="1" inputmode="decimal" /></div></div><div class="pair" id="editNowPair"><div class="field bundle-only"><label for="editBundleQty" id="editBundleQtyLabel">현재 묶음 수량</label><input id="editBundleQty" class="num-input" inputmode="numeric" /></div><div class="field"><label for="editEachQty" id="editEachQtyLabel">현재 수량</label><input id="editEachQty" class="num-input" data-decimal="1" inputmode="decimal" /></div></div><div class="modal-actions"><button id="cancelEdit">취소</button><button class="primary" id="confirmEdit">변경 저장</button></div></div>
+</div>
+<div class="modal-backdrop" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="modal"><h3 id="confirmTitle">발주를 확정할까요?</h3><div class="confirm-sum" id="confirmSum"></div><p class="hint">확정하면 재고와 발주 기록에 바로 반영되고, 거래처별로 보낼 문자 글이 만들어집니다.</p><div class="modal-actions"><button type="button" data-close="confirmModal">취소</button><button type="button" class="primary" id="confirmOrder">발주 확정</button></div></div>
+</div>
+<div class="modal-backdrop" id="msgModal" role="dialog" aria-modal="true" aria-labelledby="msgTitle">
+  <div class="modal wide"><h3 id="msgTitle">거래처별 발주 문자</h3><p class="modal-sub" id="msgSub"></p><div id="msgList"></div><p class="hint">글을 고친 뒤 복사해서 문자나 카톡에 붙여넣으세요. 고친 글은 저장되지 않으며, 발주 기록의 '문자' 버튼으로 처음 글을 다시 볼 수 있습니다.</p><div class="modal-actions"><button type="button" class="primary" data-close="msgModal">닫기</button></div></div>
+</div>
+<div class="modal-backdrop" id="histEditModal" role="dialog" aria-modal="true" aria-labelledby="heTitle">
+  <div class="modal wide"><h3 id="heTitle">발주 기록 수정</h3><p class="modal-sub" id="heSub"></p><div id="heItems"></div>
+    <div class="field"><label for="heMemo">메모</label><textarea id="heMemo" class="ta" maxlength="300" placeholder="메모 없음"></textarea></div>
+    <div class="field"><label for="heEditorBtn">수정자 *</label><div class="dd" id="heEditorDD"><button type="button" class="dd-btn placeholder" id="heEditorBtn" aria-haspopup="listbox" aria-expanded="false">수정자 선택</button><ul class="dd-list" role="listbox" hidden></ul></div><input type="hidden" id="heEditor" value="" /><div class="unit-row" id="heEditorCustomWrap" hidden><input id="heEditorCustom" placeholder="수정자 이름 직접 입력" autocomplete="off" /></div></div>
+    <p class="hint">수량을 고치면 재고도 바뀐 만큼 함께 고쳐집니다. 수량을 0으로 하면 그 품목은 기록에서 빠집니다.</p>
+    <div class="notice error" id="heMsg"></div>
+    <div class="modal-actions"><button type="button" data-close="histEditModal">취소</button><button type="button" class="primary" id="heSave">수정 저장</button></div></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+  const STORAGE_KEY = 'food-order-manager-v4';
+  const seed = {
+    items:[{"name": "양파", "category": "채소", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 4, "required": 8, "supplier": "푸른들채소", "id": 1}, {"name": "대파", "category": "채소", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 2, "required": 5, "supplier": "푸른들채소", "id": 2}, {"name": "돼지고기", "category": "육류", "bundleUnit": "팩", "eachUnit": "kg", "bundleSize": 5, "bundleQty": 1, "eachQty": 1, "required": 10, "supplier": "한우리정육", "id": 3}, {"name": "계란", "category": "유제품", "bundleUnit": "판", "eachUnit": "개", "bundleSize": 30, "bundleQty": 2, "eachQty": 5, "required": 90, "supplier": "다온식자재", "id": 4}, {"name": "식용유", "category": "양념", "bundleUnit": "", "eachUnit": "통", "bundleSize": 0, "bundleQty": 0, "eachQty": 3, "required": 2, "supplier": "다온식자재", "id": 5}, {"name": "물티슈", "category": "공산품", "bundleUnit": "박스", "eachUnit": "개", "bundleSize": 100, "bundleQty": 0, "eachQty": 35, "required": 100, "supplier": "늘푸른포장", "id": 6}, {"name": "상추", "category": "채소", "bundleUnit": "", "eachUnit": "봉지", "bundleSize": 0, "bundleQty": 0, "eachQty": 3, "required": 6, "supplier": "푸른들채소", "id": 7}, {"name": "주방 세제", "category": "공산품", "bundleUnit": "", "eachUnit": "통", "bundleSize": 0, "bundleQty": 0, "eachQty": 2, "required": 2, "supplier": "늘푸른포장", "id": 8}, {"name": "스낵냅킨", "category": "공산품", "bundleUnit": "박스", "eachUnit": "팩", "bundleSize": 20, "bundleQty": 1, "eachQty": 5, "required": 30, "supplier": "늘푸른포장", "id": 9}, {"name": "칵테일냅킨", "category": "공산품", "bundleUnit": "", "eachUnit": "팩", "bundleSize": 0, "bundleQty": 0, "eachQty": 12, "required": 10, "supplier": "늘푸른포장", "id": 10}, {"name": "종이봉투(대)", "category": "공산품", "bundleUnit": "묶음", "eachUnit": "장", "bundleSize": 100, "bundleQty": 1, "eachQty": 20, "required": 150, "supplier": "늘푸른포장", "id": 11}, {"name": "종이봉투(소)", "category": "공산품", "bundleUnit": "묶음", "eachUnit": "장", "bundleSize": 100, "bundleQty": 2, "eachQty": 0, "required": 150, "supplier": "늘푸른포장", "id": 12}, {"name": "일회용 장갑", "category": "공산품", "bundleUnit": "", "eachUnit": "박스", "bundleSize": 0, "bundleQty": 0, "eachQty": 4, "required": 3, "supplier": "늘푸른포장", "id": 13}, {"name": "위생모", "category": "공산품", "bundleUnit": "봉지", "eachUnit": "개", "bundleSize": 100, "bundleQty": 0, "eachQty": 60, "required": 100, "supplier": "늘푸른포장", "id": 14}, {"name": "키친타월", "category": "공산품", "bundleUnit": "박스", "eachUnit": "롤", "bundleSize": 24, "bundleQty": 1, "eachQty": 2, "required": 24, "supplier": "늘푸른포장", "id": 15}, {"name": "포장용기(중)", "category": "공산품", "bundleUnit": "박스", "eachUnit": "개", "bundleSize": 200, "bundleQty": 1, "eachQty": 50, "required": 200, "supplier": "늘푸른포장", "id": 16}, {"name": "랩", "category": "공산품", "bundleUnit": "", "eachUnit": "롤", "bundleSize": 0, "bundleQty": 0, "eachQty": 2, "required": 3, "supplier": "늘푸른포장", "id": 17}, {"name": "쓰레기봉투(50L)", "category": "공산품", "bundleUnit": "", "eachUnit": "묶음", "bundleSize": 0, "bundleQty": 0, "eachQty": 5, "required": 4, "supplier": "늘푸른포장", "id": 18}, {"name": "나무젓가락", "category": "공산품", "bundleUnit": "박스", "eachUnit": "개", "bundleSize": 1000, "bundleQty": 0, "eachQty": 400, "required": 500, "supplier": "늘푸른포장", "id": 19}, {"name": "빨대", "category": "공산품", "bundleUnit": "", "eachUnit": "봉지", "bundleSize": 0, "bundleQty": 0, "eachQty": 3, "required": 2, "supplier": "늘푸른포장", "id": 20}, {"name": "알루미늄 호일", "category": "공산품", "bundleUnit": "", "eachUnit": "롤", "bundleSize": 0, "bundleQty": 0, "eachQty": 2, "required": 2, "supplier": "늘푸른포장", "id": 21}, {"name": "수세미", "category": "공산품", "bundleUnit": "", "eachUnit": "개", "bundleSize": 0, "bundleQty": 0, "eachQty": 3, "required": 5, "supplier": "늘푸른포장", "id": 22}, {"name": "행주", "category": "공산품", "bundleUnit": "", "eachUnit": "장", "bundleSize": 0, "bundleQty": 0, "eachQty": 20, "required": 10, "supplier": "늘푸른포장", "id": 23}, {"name": "간장", "category": "양념", "bundleUnit": "", "eachUnit": "통", "bundleSize": 0, "bundleQty": 0, "eachQty": 2, "required": 2, "supplier": "다온식자재", "id": 24}, {"name": "설탕", "category": "양념", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 4, "required": 5, "supplier": "다온식자재", "id": 25}, {"name": "소금", "category": "양념", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 3, "required": 2, "supplier": "다온식자재", "id": 26}, {"name": "고추장", "category": "양념", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 6, "required": 5, "supplier": "다온식자재", "id": 27}, {"name": "된장", "category": "양념", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 2, "required": 3, "supplier": "다온식자재", "id": 28}, {"name": "참기름", "category": "양념", "bundleUnit": "", "eachUnit": "L", "bundleSize": 0, "bundleQty": 0, "eachQty": 1.5, "required": 1, "supplier": "다온식자재", "id": 29}, {"name": "다진마늘", "category": "양념", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 1, "required": 2, "supplier": "다온식자재", "id": 30}, {"name": "식초", "category": "양념", "bundleUnit": "", "eachUnit": "통", "bundleSize": 0, "bundleQty": 0, "eachQty": 1, "required": 1, "supplier": "다온식자재", "id": 31}, {"name": "후추", "category": "양념", "bundleUnit": "", "eachUnit": "통", "bundleSize": 0, "bundleQty": 0, "eachQty": 2, "required": 1, "supplier": "다온식자재", "id": 32}, {"name": "물엿", "category": "양념", "bundleUnit": "", "eachUnit": "통", "bundleSize": 0, "bundleQty": 0, "eachQty": 1, "required": 2, "supplier": "다온식자재", "id": 33}, {"name": "감자", "category": "채소", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 10, "required": 8, "supplier": "푸른들채소", "id": 34}, {"name": "당근", "category": "채소", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 3, "required": 4, "supplier": "푸른들채소", "id": 35}, {"name": "애호박", "category": "채소", "bundleUnit": "", "eachUnit": "개", "bundleSize": 0, "bundleQty": 0, "eachQty": 6, "required": 5, "supplier": "푸른들채소", "id": 36}, {"name": "깻잎", "category": "채소", "bundleUnit": "", "eachUnit": "묶음", "bundleSize": 0, "bundleQty": 0, "eachQty": 4, "required": 5, "supplier": "푸른들채소", "id": 37}, {"name": "청양고추", "category": "채소", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 1, "required": 1, "supplier": "푸른들채소", "id": 38}, {"name": "양배추", "category": "채소", "bundleUnit": "", "eachUnit": "개", "bundleSize": 0, "bundleQty": 0, "eachQty": 4, "required": 3, "supplier": "푸른들채소", "id": 39}, {"name": "콩나물", "category": "채소", "bundleUnit": "", "eachUnit": "봉지", "bundleSize": 0, "bundleQty": 0, "eachQty": 3, "required": 4, "supplier": "푸른들채소", "id": 40}, {"name": "팽이버섯", "category": "채소", "bundleUnit": "", "eachUnit": "봉지", "bundleSize": 0, "bundleQty": 0, "eachQty": 6, "required": 5, "supplier": "푸른들채소", "id": 41}, {"name": "두부", "category": "가공식품", "bundleUnit": "", "eachUnit": "모", "bundleSize": 0, "bundleQty": 0, "eachQty": 5, "required": 6, "supplier": "다온식자재", "id": 42}, {"name": "닭고기", "category": "육류", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 8, "required": 10, "supplier": "한우리정육", "id": 43}, {"name": "소고기 국거리", "category": "육류", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 3, "required": 2, "supplier": "한우리정육", "id": 44}, {"name": "삼겹살", "category": "육류", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 12, "required": 10, "supplier": "한우리정육", "id": 45}, {"name": "오징어", "category": "수산", "bundleUnit": "", "eachUnit": "마리", "bundleSize": 0, "bundleQty": 0, "eachQty": 6, "required": 10, "supplier": "바다마을수산", "id": 46}, {"name": "새우", "category": "수산", "bundleUnit": "", "eachUnit": "팩", "bundleSize": 0, "bundleQty": 0, "eachQty": 4, "required": 3, "supplier": "바다마을수산", "id": 47}, {"name": "멸치", "category": "수산", "bundleUnit": "", "eachUnit": "kg", "bundleSize": 0, "bundleQty": 0, "eachQty": 1, "required": 1, "supplier": "바다마을수산", "id": 48}, {"name": "고등어", "category": "수산", "bundleUnit": "", "eachUnit": "마리", "bundleSize": 0, "bundleQty": 0, "eachQty": 8, "required": 6, "supplier": "바다마을수산", "id": 49}, {"name": "우유", "category": "유제품", "bundleUnit": "", "eachUnit": "L", "bundleSize": 0, "bundleQty": 0, "eachQty": 3, "required": 4, "supplier": "다온식자재", "id": 50}, {"name": "치즈", "category": "유제품", "bundleUnit": "팩", "eachUnit": "장", "bundleSize": 50, "bundleQty": 1, "eachQty": 10, "required": 50, "supplier": "다온식자재", "id": 51}, {"name": "버터", "category": "유제품", "bundleUnit": "", "eachUnit": "개", "bundleSize": 0, "bundleQty": 0, "eachQty": 2, "required": 2, "supplier": "다온식자재", "id": 52}], history:[], nextId:53
+  };
+  const clone = obj => JSON.parse(JSON.stringify(obj));
+  let saved = loadSaved();
+  let state = clone(saved);
+  let viewMode = 'all';
+  let editingId = null;
+  let orderQuantities = {};
+  const $ = id => document.getElementById(id);
+  function loadSaved(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const data=JSON.parse(raw);if(data&&Array.isArray(data.items)&&Array.isArray(data.history))return data;}}catch(e){}return clone(seed);}
+  function persist(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));saved=clone(state);}
+  function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2200);}
+  function total(item){return item.bundleUnit ? Number(item.bundleQty||0)*Number(item.bundleSize||0)+Number(item.eachQty||0) : Number(item.eachQty||0);}
+  function low(item){return total(item)<Number(item.required);}
+  function needed(){return state.items.filter(low);}
+  function fmt(n){return Number.isInteger(Number(n))?String(Number(n)):String(Number(n).toFixed(2)).replace(/0+$/,'').replace(/\.$/,'');}
+  function qtyText(item){if(item.bundleUnit)return `${fmt(item.bundleQty)}${item.bundleUnit} ${fmt(item.eachQty)}${item.eachUnit}`;return `${fmt(item.eachQty)}${item.eachUnit}`;}
+  function totalText(item){return item.bundleUnit?`총 ${fmt(total(item))}${item.eachUnit}`:'';}
+  function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function showView(name){document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id===`view-${name}`));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));$('saveArea').style.visibility=name==='register'?'hidden':'visible';if(name==='register')renderSupplierOptions();if(name==='orders')renderOrders();if(name==='history'){historyPage=1;$('histMonth').value='all';renderHistory();window.scrollTo(0,0);}}
+  document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+  function updateCount(){const n=needed().length;$('needCount').innerHTML=n?`<span class="count">${n}</span>`:'';}
+  const CATEGORY_ORDER=['채소','육류','수산','유제품','양념','공산품'];
+  const PAGE_SIZE=10;
+  let currentPage=1;
+  const byName=(a,b)=>a.name.localeCompare(b.name,'ko');
+  function groupKey(){return viewMode==='supplier'?'supplier':'category';}
+  function groupOf(i){return i[groupKey()]||'미분류';}
+  function catRank(c){const r=CATEGORY_ORDER.indexOf(c);return r<0?99:r;}
+  // 검색 + 정렬 (전체: 품목명 가나다순 / 묶어 보기: 묶음 순서 → 품목명 가나다순)
+  function sortedItems(){
+    const query=$('searchInput').value.trim().toLowerCase();
+    let items=state.items.filter(i=>i.name.toLowerCase().includes(query));
+    if(viewMode==='all')return items.sort(byName);
+    if(groupFilter)items=items.filter(i=>groupOf(i)===groupFilter);   // 드롭다운에서 고른 거래처/분류만
+    return items.sort((a,b)=>{const ga=groupOf(a),gb=groupOf(b);if(ga!==gb){const r=viewMode==='category'?catRank(ga)-catRank(gb):0;return r||ga.localeCompare(gb,'ko');}return byName(a,b);});
+  }
+  // ===== 거래처별/분류별 보기: 드롭다운으로 하나만 골라 보기 =====
+  let groupFilter='';
+  const optLi=(v,label,sel)=>`<li role="option" tabindex="0" class="dd-opt${sel?' selected':''}" data-v="${escapeHtml(v)}" aria-selected="${sel}"><span>${escapeHtml(label)}</span></li>`;
+  function groupList(){const vals=[...new Set(state.items.map(groupOf))];return vals.sort((a,b)=>viewMode==='category'?(catRank(a)-catRank(b))||a.localeCompare(b,'ko'):a.localeCompare(b,'ko'));}
+  function renderGroupFilter(){
+    const dd=$('groupFilterDD');dd.hidden=viewMode==='all';if(viewMode==='all')return;
+    const list=groupList();if(groupFilter&&!list.includes(groupFilter))groupFilter='';
+    const allLabel=viewMode==='supplier'?'전체 거래처':'전체 분류';
+    $('groupFilterBtn').textContent=groupFilter||allLabel;
+    dd.querySelector('.dd-list').innerHTML=['',...list].map(k=>optLi(k,k||allLabel,k===groupFilter)).join('');
+  }
+  function renderInventory(){
+    renderGroupFilter();
+    const items=sortedItems();
+    const grouped=viewMode!=='all';
+    const totalPages=Math.max(1,Math.ceil(items.length/PAGE_SIZE));
+    if(currentPage>totalPages)currentPage=totalPages;
+    if(!items.length){
+      $('inventoryTable').innerHTML=`<div class="empty"><strong>${state.items.length?'검색 결과가 없습니다.':'등록된 품목이 없습니다.'}</strong>${state.items.length?'품목명을 다시 확인해 주세요.':'품목 등록 화면에서 품목을 추가해 주세요.'}</div>`;
+      $('inventoryCards').innerHTML='';$('pagination').innerHTML='';bindInventoryActions();updateCount();return;
+    }
+    const pageItems=items.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);
+    // 묶음별 전체 품목 수 (페이지가 나뉘어도 같은 숫자로 표시)
+    const groupCount={};if(grouped)items.forEach(i=>{const k=groupOf(i);groupCount[k]=(groupCount[k]||0)+1;});
+    // 이번 페이지 품목을 묶음별로 나누기
+    const groups=[];pageItems.forEach(i=>{const k=grouped?groupOf(i):'';let g=groups[groups.length-1];if(!g||g.title!==k){g={title:k,items:[]};groups.push(g);}g.items.push(i);});
+    const showCategory=viewMode!=='category', showSupplier=viewMode!=='supplier';
+    let table='<table><thead><tr>'+(grouped?`<th>${viewMode==='supplier'?'거래처':'분류'}</th>`:'')+'<th class="name-cell">품목명</th>'+(showCategory?'<th>분류</th>':'')+'<th>현재 수량</th><th>수량 변경</th><th>필요 수량</th>'+(showSupplier?'<th>거래처</th>':'')+'<th>관리</th></tr></thead><tbody>';
+    let cards='';
+    groups.forEach(g=>{
+      if(grouped)cards+=`<div class="card-group-title">${escapeHtml(g.title)} <span class="pill">${groupCount[g.title]}개</span></div>`;
+      g.items.forEach((i,idx)=>{const isLow=low(i);const cls=isLow?'low':'';const parts=i.bundleUnit?[['bundleQty',i.bundleUnit],['eachQty',i.eachUnit]]:[['eachQty',i.eachUnit]];
+        const qtyCell=`<div class="qty-lines">${parts.map(([f,u])=>`<div class="qty-line"><span class="qty">${fmt(i[f])} ${escapeHtml(u)}</span></div>`).join('')}${i.bundleUnit?`<div class="total-small">${totalText(i)}</div>`:''}</div>`;
+        const stepCell=`<div class="qty-lines">${parts.map(([f])=>`<div class="qty-line">${stepper(i.id,f)}</div>`).join('')}</div>`;
+        const groupCell=grouped&&idx===0?`<td class="group-cell" rowspan="${g.items.length}">${escapeHtml(g.title)}<span class="pill">${groupCount[g.title]}개</span></td>`:'';
+        table+=`<tr class="stock-row ${cls}">${groupCell}<td class="name-cell"><span class="item-name">${escapeHtml(i.name)}</span></td>${showCategory?`<td>${escapeHtml(i.category)}</td>`:''}<td class="qty-cell ${isLow?'low-text':''}">${qtyCell}</td><td class="step-cell">${stepCell}</td><td>${fmt(i.required)} ${escapeHtml(i.eachUnit)}</td>${showSupplier?`<td>${escapeHtml(i.supplier)}</td>`:''}<td><div class="actions"><button data-edit="${i.id}">수정</button><button class="danger" data-delete="${i.id}">삭제</button></div></td></tr>`;
+        const controls=i.bundleUnit?`${cardStep(i,'bundleQty',i.bundleUnit)}${cardStep(i,'eachQty',i.eachUnit)}`:cardStep(i,'eachQty',i.eachUnit);
+        // 휴대폰 카드: 위(품목명 + 수정/삭제) / 아래(분류·거래처·필요 수량 + 수량 조절)
+        const meta=[showCategory?i.category:'',showSupplier?i.supplier:''].filter(Boolean).map(escapeHtml).join(' · ');
+        const needLine=`필요 ${fmt(i.required)}${escapeHtml(i.eachUnit)}${i.bundleUnit?` · 현재 총 ${fmt(total(i))}${escapeHtml(i.eachUnit)}`:''}`;
+        cards+=`<article class="stock-card ${cls}"><div class="sc-top"><div class="item-name">${escapeHtml(i.name)}${isLow?'<span class="low-badge">부족</span>':''}</div><div class="card-actions"><button data-edit="${i.id}">수정</button><button class="danger" data-delete="${i.id}">삭제</button></div></div><div class="sc-bottom"><div class="card-meta">${meta?meta+'<br>':''}${needLine}</div><div class="card-controls">${controls}</div></div></article>`;
+      });
+    });
+    table+='</tbody></table>';
+    $('inventoryTable').innerHTML=table;$('inventoryCards').innerHTML=cards;
+    renderPagination(totalPages);
+    bindInventoryActions();updateCount();
+  }
+  // 페이지 버튼: 1쪽 → 번호만 / 2~5쪽 → ‹ › / 6쪽 이상 → « ‹ › »
+  function renderPagination(totalPages,cur=currentPage,elId='pagination'){
+    const blockStart=Math.floor((cur-1)/5)*5+1;const blockEnd=Math.min(blockStart+4,totalPages);
+    const btn=(label,page,disabled,aria,extra='')=>`<button type="button" class="page-btn ${extra}" data-page="${page}" ${disabled?'disabled':''} aria-label="${aria}">${label}</button>`;
+    let h='';
+    if(totalPages>=6)h+=btn('«',Math.max(1,cur-5),cur===1,'5페이지 앞으로');
+    if(totalPages>=2)h+=btn('‹',cur-1,cur===1,'이전 페이지');
+    for(let p=blockStart;p<=blockEnd;p++)h+=btn(p,p,false,`${p}페이지`,p===cur?'active" aria-current="page':'');
+    if(totalPages>=2)h+=btn('›',cur+1,cur===totalPages,'다음 페이지');
+    if(totalPages>=6)h+=btn('»',Math.min(totalPages,cur+5),cur===totalPages,'5페이지 뒤로');
+    $(elId).innerHTML=h;
+  }
+  $('pagination').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b||b.disabled)return;currentPage=Number(b.dataset.page);renderInventory();$('view-inventory').scrollIntoView({behavior:'smooth',block:'start'});});
+  function stepper(id,field){return `<div class="stepper"><button aria-label="수량 줄이기" data-step="${id}" data-field="${field}" data-delta="-1">−</button><button aria-label="수량 늘리기" data-step="${id}" data-field="${field}" data-delta="1">＋</button></div>`;}
+  function stepLine(i,field,unit){return `<div class="qty-line"><span class="qty">${fmt(i[field])} ${escapeHtml(unit)}</span>${stepper(i.id,field)}</div>`;}
+  // 휴대폰 수량 조절: [−  2판  ＋] (단위는 숫자 오른쪽, 화살표 안쪽)
+  function cardStep(i,field,unit){return `<div class="stepper"><button aria-label="${escapeHtml(unit)} 수량 줄이기" data-step="${i.id}" data-field="${field}" data-delta="-1">−</button><span class="sv"><b>${fmt(i[field])}</b><small>${escapeHtml(unit)}</small></span><button aria-label="${escapeHtml(unit)} 수량 늘리기" data-step="${i.id}" data-field="${field}" data-delta="1">＋</button></div>`;}
+  function bindInventoryActions(){document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{const item=state.items.find(i=>i.id===Number(b.dataset.step));if(!item)return;const f=b.dataset.field;item[f]=Math.max(0,Number(item[f]||0)+Number(b.dataset.delta));renderInventory();}));document.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openEdit(Number(b.dataset.edit))));document.querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>{const id=Number(b.dataset.delete);const item=state.items.find(i=>i.id===id);if(!item)return;if(confirm(`'${item.name}' 품목을 삭제할까요?`)){state.items=state.items.filter(i=>i.id!==id);delete orderQuantities[id];renderInventory();renderOrders();}}));}
+  $('searchInput').addEventListener('input',()=>{currentPage=1;renderInventory();});
+  // 직접 만든 드롭다운(삭제 × 없는 것) 공통 동작
+  function bindSimpleDD(wrap,onPick){const btn=wrap.querySelector('.dd-btn'),list=wrap.querySelector('.dd-list');
+    btn.addEventListener('click',()=>{const open=list.hidden;closeDropdowns(wrap);list.hidden=!open;btn.setAttribute('aria-expanded',String(open));});
+    list.addEventListener('click',e=>{const li=e.target.closest('[data-v]');if(!li)return;list.hidden=true;btn.setAttribute('aria-expanded','false');onPick(li.dataset.v);btn.focus();});
+    list.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.v!==undefined){e.preventDefault();e.target.click();}});}
+  bindSimpleDD($('groupFilterDD'),v=>{groupFilter=v;currentPage=1;renderInventory();});
+  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{viewMode=b.dataset.mode;currentPage=1;groupFilter='';document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));renderInventory();}));
+  function openEdit(id){const item=state.items.find(i=>i.id===id);if(!item)return;editingId=id;
+    const has=!!item.bundleUnit,bu=item.bundleUnit,eu=item.eachUnit;
+    $('editTitle').textContent=`${item.name} 수정`;
+    document.querySelectorAll('#editModal .bundle-only').forEach(el=>el.hidden=!has);['editReqPair','editNowPair'].forEach(id=>$(id).classList.toggle('two',has));
+    $('editBundleSizeLabel').textContent=`묶음당 낱개 수 (1${bu} = ?${eu})`;
+    $('editBundleQtyLabel').textContent=`현재 묶음 수량 (${bu})`;
+    $('editEachQtyLabel').textContent=has?`현재 낱개 수량 (${eu})`:`현재 수량 (${eu})`;
+    $('editReqBundleLabel').textContent=`필요 묶음 수량 (${bu})`;
+    $('editRequiredLabel').textContent=has?`필요 낱개 수량 (${eu})`:`필요 수량 (${eu})`;
+    $('editEachQty').value=fmt(item.eachQty);
+    if(has){const rb=Math.floor(Number(item.required)/item.bundleSize);$('editBundleSize').value=item.bundleSize;$('editBundleQty').value=item.bundleQty;$('editRequiredBundle').value=rb;$('editRequired').value=fmt(Number(item.required)-rb*item.bundleSize);}
+    else $('editRequired').value=fmt(item.required);
+    $('editModal').classList.add('open');}
+  $('cancelEdit').addEventListener('click',()=>$('editModal').classList.remove('open'));
+  $('editModal').addEventListener('click',e=>{if(e.target===$('editModal'))$('editModal').classList.remove('open');});
+  $('confirmEdit').addEventListener('click',()=>{const item=state.items.find(i=>i.id===editingId);if(!item)return;
+    const has=!!item.bundleUnit;const v=id=>$(id).value.trim();
+    const fields=has?['editBundleSize','editBundleQty','editEachQty','editRequiredBundle','editRequired']:['editEachQty','editRequired'];
+    if(fields.some(id=>v(id)===''||!Number.isFinite(Number(v(id))))){toast('모든 칸에 수량을 입력해 주세요.');return;}
+    const each=Number(v('editEachQty')),reqEach=Number(v('editRequired'));
+    if(has){const size=Number(v('editBundleSize'));if(size<1){toast('묶음당 낱개 수는 1 이상이어야 해요.');return;}
+      item.bundleSize=size;item.bundleQty=Number(v('editBundleQty'));item.required=Number((Number(v('editRequiredBundle'))*size+reqEach).toFixed(6));}
+    else item.required=reqEach;
+    item.eachQty=each;
+    $('editModal').classList.remove('open');renderInventory();renderOrders();});
+  // ===== 숫자 입력칸: 숫자만 입력, 앞자리 0 자동 삭제 =====
+  function cleanNumber(v,allowDecimal){
+    v=String(v).replace(allowDecimal?/[^\d.]/g:/\D/g,'');
+    if(allowDecimal){const d=v.indexOf('.');if(d>=0)v=v.slice(0,d+1)+v.slice(d+1).replace(/\./g,'');if(v.startsWith('.'))v='0'+v;}
+    return v.replace(/^0+(?=\d)/,'');
+  }
+  document.addEventListener('input',e=>{const el=e.target;if(!el.classList||!el.classList.contains('num-input'))return;const c=cleanNumber(el.value,el.dataset.decimal==='1');if(c!==el.value)el.value=c;});
+
+  // ===== 직접 만든 드롭다운: 각 이름 오른쪽 ×를 누르면 목록에서 삭제 =====
+  const OPTIONS_KEY='food-order-manager-options-v1';
+  const DD={
+    category:{placeholder:'분류 선택',head:[],tail:[['custom','직접입력']],base:['채소','육류','수산','유제품','양념','공산품']},
+    bundleUnit:{placeholder:'없음',head:[['','없음']],tail:[['custom','직접입력']],base:['박스','판','봉지','팩','통','묶음']},
+    eachUnit:{placeholder:'단위 선택',head:[],tail:[['custom','직접입력']],base:['개','kg','g','L','박스','판','봉지','팩','통','묶음']},
+    supplierSelect:{placeholder:'거래처 선택',head:[],tail:[['custom','직접입력']],base:[]},
+    buyerSelect:{placeholder:'발주자 선택',head:[],tail:[['custom','직접입력']],base:['김민지','박준호']}
+  };
+  const DD_DEFAULT={category:'',bundleUnit:'',eachUnit:'',supplierSelect:'',buyerSelect:''};
+  const byKo=(a,b)=>a.localeCompare(b,'ko');
+  function initialOptions(){const uniq=a=>[...new Set(a.filter(Boolean))];const it=state.items;
+    return {category:uniq([...DD.category.base,...it.map(i=>i.category)]),bundleUnit:uniq([...DD.bundleUnit.base,...it.map(i=>i.bundleUnit)]),
+      eachUnit:uniq([...DD.eachUnit.base,...it.map(i=>i.eachUnit)]),supplierSelect:uniq(it.map(i=>i.supplier)).sort(byKo),buyerSelect:[...DD.buyerSelect.base]};}
+  let ddOptions=(()=>{try{const o=JSON.parse(localStorage.getItem(OPTIONS_KEY));if(o&&typeof o==='object'){const init=initialOptions();Object.keys(DD).forEach(k=>{if(!Array.isArray(o[k]))o[k]=init[k];});return o;}}catch(e){}return initialOptions();})();
+  function saveOptions(){try{localStorage.setItem(OPTIONS_KEY,JSON.stringify(ddOptions));}catch(e){}}
+  function addOption(id,value){if(!value||ddOptions[id].includes(value))return;ddOptions[id].push(value);if(id==='supplierSelect')ddOptions[id].sort(byKo);}
+  function ddLabel(id){const v=$(id).value;const f=[...DD[id].head,...DD[id].tail].find(x=>x[0]===v);return f?f[1]:(v||DD[id].placeholder);}
+  function renderDropdown(id){
+    const wrap=document.querySelector(`.dd[data-for="${id}"]`),v=$(id).value,btn=wrap.querySelector('.dd-btn');
+    btn.textContent=ddLabel(id);btn.classList.toggle('placeholder',v===''&&!DD[id].head.length);
+    const li=(val,label,deletable)=>`<li role="option" tabindex="0" class="dd-opt${val===v?' selected':''}" data-value="${escapeHtml(val)}" aria-selected="${val===v}"><span>${escapeHtml(label)}</span>${deletable?`<button type="button" class="dd-del" data-del="${escapeHtml(val)}" aria-label="${escapeHtml(label)} 목록에서 삭제">×</button>`:''}</li>`;
+    wrap.querySelector('.dd-list').innerHTML=DD[id].head.map(([a,b])=>li(a,b,false)).join('')+ddOptions[id].map(x=>li(x,x,true)).join('')+DD[id].tail.map(([a,b])=>li(a,b,false)).join('');
+  }
+  function renderAllDropdowns(){Object.keys(DD).forEach(id=>{const v=$(id).value;const ok=v===DD_DEFAULT[id]||v==='custom'||ddOptions[id].includes(v)||DD[id].head.some(h=>h[0]===v);if(!ok)$(id).value=DD_DEFAULT[id];renderDropdown(id);});updateRegisterForm();}
+  const renderSupplierOptions=renderAllDropdowns;
+  function closeDropdowns(except){document.querySelectorAll('.dd').forEach(w=>{if(w===except)return;w.querySelector('.dd-list').hidden=true;w.querySelector('.dd-btn').setAttribute('aria-expanded','false');});}
+  function setDropdown(id,value){$(id).value=value;renderDropdown(id);$(id).dispatchEvent(new Event('change'));}
+  document.querySelectorAll('.dd[data-for]').forEach(wrap=>{const id=wrap.dataset.for,list=wrap.querySelector('.dd-list'),btn=wrap.querySelector('.dd-btn');
+    btn.addEventListener('click',()=>{const open=list.hidden;closeDropdowns(wrap);list.hidden=!open;btn.setAttribute('aria-expanded',String(open));});
+    list.addEventListener('click',e=>{
+      const del=e.target.closest('.dd-del');
+      if(del){e.stopPropagation();const val=del.dataset.del;ddOptions[id]=ddOptions[id].filter(x=>x!==val);saveOptions();
+        if($(id).value===val)setDropdown(id,DD_DEFAULT[id]);else renderDropdown(id);toast(`'${val}' 항목을 목록에서 삭제했습니다.`);return;}
+      const opt=e.target.closest('.dd-opt');if(!opt)return;list.hidden=true;btn.setAttribute('aria-expanded','false');setDropdown(id,opt.dataset.value);btn.focus();});
+    list.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('dd-opt')){e.preventDefault();e.target.click();}});
+  });
+  document.addEventListener('click',e=>{if(!e.target.closest('.dd'))closeDropdowns();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDropdowns();});
+
+  function selectedValue(selectId,customId){return $(selectId).value==='custom'?$(customId).value.trim():$(selectId).value;}
+  const CUSTOM_INPUT={category:'categoryCustom',bundleUnit:'bundleCustom',eachUnit:'eachCustom',supplierSelect:'supplier',buyerSelect:'buyerName'};
+  const CUSTOM_WRAP={category:'categoryCustomWrap',bundleUnit:'bundleCustomWrap',eachUnit:'eachCustomWrap',supplierSelect:'supplierCustomWrap',buyerSelect:'buyerCustomWrap'};
+  function updateRegisterForm(){
+    Object.keys(CUSTOM_WRAP).forEach(id=>$(CUSTOM_WRAP[id]).hidden=$(id).value!=='custom');
+    const has=!!$('bundleUnit').value;
+    document.querySelectorAll('#registerForm .bundle-only').forEach(el=>el.hidden=!has);
+    // 줄 맞춤: 묶음 단위가 있으면 묶음 칸이, 없으면 낱개 칸이 줄 맨 앞
+    $('requiredField').classList.toggle('row-start',!has);$('eachQtyField').classList.toggle('row-start',!has);
+    const bu=selectedValue('bundleUnit','bundleCustom')||'묶음',eu=selectedValue('eachUnit','eachCustom')||'낱개',eSuffix=$('eachUnit').value?` (${eu})`:'';
+    $('bundleSizeLabel').textContent=`묶음당 낱개 수 (1${bu} = ?${eu}) *`;
+    $('bundleQtyLabel').textContent=`현재 묶음 수량 (${bu}) *`;
+    $('eachQtyLabel').textContent=has?`현재 낱개 수량${eSuffix} *`:`현재 수량${eSuffix} *`;
+    $('requiredBundleLabel').textContent=`필요 묶음 수량 (${bu}) *`;
+    $('requiredLabel').textContent=has?`필요 낱개 수량${eSuffix} *`:`필요 수량${eSuffix} *`;
+  }
+  Object.keys(CUSTOM_INPUT).forEach(id=>$(id).addEventListener('change',()=>{
+    const custom=$(id).value==='custom';
+    if(!custom)$(CUSTOM_INPUT[id]).value='';
+    if(id==='bundleUnit'&&!$(id).value)['bundleSize','bundleQty','requiredBundleQty'].forEach(f=>$(f).value='');
+    updateRegisterForm();
+    if(custom)$(CUSTOM_INPUT[id]).focus();
+  }));
+  ['bundleCustom','eachCustom'].forEach(id=>$(id).addEventListener('input',updateRegisterForm));
+
+  function regError(msg){$('registerMessage').textContent=msg;$('registerMessage').classList.add('error');}
+  $('registerForm').addEventListener('submit',e=>{e.preventDefault();
+    const has=!!$('bundleUnit').value;const v=id=>$(id).value.trim();
+    const name=v('itemName'),category=selectedValue('category','categoryCustom'),supplier=selectedValue('supplierSelect','supplier');
+    const bundleUnit=has?selectedValue('bundleUnit','bundleCustom'):'',eachUnit=selectedValue('eachUnit','eachCustom');
+    const need=[name,category,supplier,eachUnit,v('eachQty'),v('requiredQty')];
+    if(has)need.push(bundleUnit,v('bundleSize'),v('bundleQty'),v('requiredBundleQty'));
+    if(need.some(x=>x===''))return regError('모든 칸을 입력해 주세요.');
+    const eachQty=Number(v('eachQty')),reqEach=Number(v('requiredQty'));
+    const bundleSize=has?Number(v('bundleSize')):0,bundleQty=has?Number(v('bundleQty')):0,reqBundle=has?Number(v('requiredBundleQty')):0;
+    if([eachQty,reqEach,bundleSize,bundleQty,reqBundle].some(n=>!Number.isFinite(n)||n<0))return regError('수량은 숫자로 입력해 주세요.');
+    if(has&&bundleSize<1)return regError('묶음당 낱개 수는 1 이상이어야 해요.');
+    if(state.items.some(i=>i.name.toLowerCase()===name.toLowerCase()))return regError('이미 등록된 품목명입니다.');
+    const required=has?Number((reqBundle*bundleSize+reqEach).toFixed(6)):reqEach;
+    state.items.push({id:state.nextId++,name,category,supplier,bundleUnit,eachUnit,bundleSize,bundleQty,eachQty,required});persist();
+    // 직접 입력한 이름은 드롭다운 목록에 다시 추가
+    addOption('category',category);if(has)addOption('bundleUnit',bundleUnit);addOption('eachUnit',eachUnit);addOption('supplierSelect',supplier);saveOptions();
+    $('registerForm').reset();Object.keys(DD).filter(id=>id!=='buyerSelect').forEach(id=>$(id).value=DD_DEFAULT[id]);renderAllDropdowns();
+    $('registerMessage').textContent='* 표시된 항목을 모두 입력해 주세요.';$('registerMessage').classList.remove('error');
+    renderInventory();toast('품목이 등록되고 저장되었습니다.');showView('inventory');
+  });
+  renderAllDropdowns();
+  // ===== 발주 필요 목록 =====
+  let manualOrderIds=new Set();   // 직접 추가한 품목
+  let orderInputs={};             // 직접 고친 발주 수량 {id:{sig,b,e}}
+  const orderSig=i=>`${total(i)}|${i.required}|${i.bundleSize}`;  // 재고가 바뀌면 다시 자동 계산
+  function splitTxt(i,n){const b=Math.floor((Number(n)+1e-9)/i.bundleSize);return `${b}${i.bundleUnit} ${fmt(Number(n)-b*i.bundleSize)}${i.eachUnit}`;}
+  function defaultAmount(i){const need=Math.max(0,Number(i.required)-total(i));if(need===0)return {b:'',e:''};
+    if(i.bundleUnit){const b=Math.floor((need+1e-9)/i.bundleSize);return {b:String(b),e:fmt(need-b*i.bundleSize)};}return {b:'',e:fmt(need)};}
+  function currentAmount(i){const o=orderInputs[i.id];return o&&o.sig===orderSig(i)?o:defaultAmount(i);}
+  function amountOf(i,o){return Number(((i.bundleUnit?Number(o.b||0)*i.bundleSize:0)+Number(o.e||0)).toFixed(6));}
+  let excludedIds=new Set();
+  let orderNotes={};             // 품목별 특이사항 {id:글}
+  let openNotes=new Set();       // 특이사항 입력칸을 연 품목
+  const noteBtn=i=>`<button type="button" class="note-add" data-note-open="${i.id}">＋ 특이사항</button>`;
+  const noteInput=i=>`<input type="text" data-note="${i.id}" maxlength="100" value="${escapeHtml(orderNotes[i.id]||'')}" placeholder="특이사항" aria-label="${escapeHtml(i.name)} 특이사항" />`;
+  function noteHtml(i){return (openNotes.has(i.id)||orderNotes[i.id])?noteInput(i):noteBtn(i);}     // 목록에서 뺀 발주 필요 품목
+  let orderMode='all';
+  // 직접 추가한 품목(최근 추가한 것부터) → 발주 필요 품목(가나다순)
+  function orderListItems(){
+    [...manualOrderIds].forEach(id=>{if(!state.items.some(i=>i.id===id))manualOrderIds.delete(id);});
+    const manualIds=[...manualOrderIds].reverse();const inManual=new Set(manualIds);
+    const manual=manualIds.map(id=>state.items.find(i=>i.id===id));
+    const lows=needed().filter(i=>!excludedIds.has(i.id)&&!inManual.has(i.id)).sort(byName);
+    return [...manual,...lows];
+  }
+  function orderGroups(list){
+    if(orderMode==='all')return [{title:'',items:list}];
+    const key=orderMode==='supplier'?'supplier':'category';const g=i=>i[key]||'미분류';
+    const titles=[...new Set(list.map(g))].sort((a,b)=>key==='category'?(catRank(a)-catRank(b))||a.localeCompare(b,'ko'):a.localeCompare(b,'ko'));
+    return titles.map(t=>({title:t,items:list.filter(i=>g(i)===t)}));
+  }
+  function renderOrders(){
+    const list=orderListItems();
+    const card=i=>{
+      const isLow=low(i),has=!!i.bundleUnit,o=currentAmount(i);
+      const nowText=has?`${qtyText(i)} (총 ${fmt(total(i))}${i.eachUnit})`:qtyText(i);
+      const reqText=has?`${splitTxt(i,i.required)} (총 ${fmt(i.required)}${i.eachUnit})`:`${fmt(i.required)}${i.eachUnit}`;
+      const row=(part,val,unit,dec)=>`<div class="oa-row"><input type="text" class="num-input" ${dec?'data-decimal="1" inputmode="decimal"':'inputmode="numeric"'} data-order-qty="${i.id}" data-part="${part}" value="${escapeHtml(val)}" placeholder="0" aria-label="${escapeHtml(i.name)} 발주 수량 (${escapeHtml(unit)})" /><span class="oa-unit">${escapeHtml(unit)}</span></div>`;
+      return `<article class="order-item ${isLow?'need':'manual'}"><div><h3>${escapeHtml(i.name)} <span class="pill">${escapeHtml(i.supplier)}</span>${isLow?'':'<span class="pill manual-pill">직접 추가</span>'}</h3>
+        <div class="detail">현재 ${escapeHtml(nowText)} / 필요 ${escapeHtml(reqText)}</div></div>
+        <div class="order-amount"><span class="oa-label">발주 수량</span><div class="oa-inputs">${has?row('b',o.b,i.bundleUnit,false):''}${row('e',o.e,i.eachUnit,true)}${has?`<div class="oa-total" id="oa-total-${i.id}">= 총 ${fmt(amountOf(i,o))}${escapeHtml(i.eachUnit)}</div>`:''}</div></div>
+        <div class="order-note">${noteHtml(i)}</div>
+        <div class="order-remove"><button type="button" class="remove-manual" data-remove-order="${i.id}">목록에서 빼기</button></div></article>`;
+    };
+    // 드롭다운: 거래처/분류 하나만 보기 (보기만 바뀌고, 발주 확정은 목록 전체)
+    const oKey=orderMode==='supplier'?'supplier':'category',oOf=i=>i[oKey]||'미분류';
+    const oDD=$('orderFilterDD');oDD.hidden=orderMode==='all';
+    if(orderMode!=='all'){const titles=orderGroups(list).map(g=>g.title);if(orderFilter&&!titles.includes(orderFilter))orderFilter='';
+      const allLabel=orderMode==='supplier'?'전체 거래처':'전체 분류';$('orderFilterBtn').textContent=orderFilter||allLabel;
+      oDD.querySelector('.dd-list').innerHTML=['',...titles].map(k=>optLi(k,k||allLabel,k===orderFilter)).join('');}
+    const shown=orderMode!=='all'&&orderFilter?list.filter(i=>oOf(i)===orderFilter):list;
+    const hidden=list.length-shown.length;
+    const hint=hidden?`<div class="ofilter-hint">선택하지 않은 ${orderMode==='supplier'?'거래처':'분류'}의 품목 ${hidden}개도 함께 발주됩니다.</div>`:'';
+    const html=hint+(orderMode==='all'?list.map(card).join(''):orderGroups(shown).map(g=>`<section class="order-group"><div class="order-group-name">${escapeHtml(g.title)}<span class="pill">${g.items.length}개</span></div><div class="order-group-items">${g.items.map(card).join('')}</div></section>`).join(''));
+    $('orderList').innerHTML=list.length?html:'<div class="empty"><strong>발주 목록이 비어 있습니다.</strong>필요 수량보다 적은 품목이 없어요. 발주할 품목은 위에서 직접 추가할 수 있습니다.</div>';
+    $('orderBottom').hidden=!list.length;$('orderMemoWrap').hidden=!list.length;$('orderMessage').textContent='';
+  }
+  $('orderList').addEventListener('focusout',e=>{const el=e.target;if(!el.dataset||!el.dataset.note||el.value.trim()!=='')return;const id=Number(el.dataset.note),it=state.items.find(i=>i.id===id);openNotes.delete(id);delete orderNotes[id];if(it)el.parentElement.innerHTML=noteBtn(it);});
+  let orderFilter='';
+  bindSimpleDD($('orderFilterDD'),v=>{orderFilter=v;renderOrders();});
+  document.querySelectorAll('[data-omode]').forEach(b=>b.addEventListener('click',()=>{orderMode=b.dataset.omode;orderFilter='';document.querySelectorAll('[data-omode]').forEach(x=>x.classList.toggle('active',x===b));renderOrders();}));
+  $('orderList').addEventListener('input',e=>{const el=e.target;if(el.dataset.note){orderNotes[el.dataset.note]=el.value;return;}if(!el.dataset.orderQty)return;
+    el.value=cleanNumber(el.value,el.dataset.decimal==='1');
+    const i=state.items.find(x=>x.id===Number(el.dataset.orderQty));if(!i)return;
+    const cur={...currentAmount(i)};cur[el.dataset.part]=el.value;cur.sig=orderSig(i);orderInputs[i.id]=cur;
+    const t=$('oa-total-'+i.id);if(t)t.textContent=`= 총 ${fmt(amountOf(i,cur))}${i.eachUnit}`;});
+  $('orderList').addEventListener('click',e=>{const nb=e.target.closest('[data-note-open]');if(nb){const id=Number(nb.dataset.noteOpen),it=state.items.find(i=>i.id===id);if(!it)return;openNotes.add(id);nb.parentElement.innerHTML=noteInput(it);$('orderList').querySelector(`[data-note="${id}"]`).focus();return;}const b=e.target.closest('[data-remove-order]');if(!b)return;const id=Number(b.dataset.removeOrder);const it=state.items.find(i=>i.id===id);manualOrderIds.delete(id);if(it&&low(it))excludedIds.add(id);delete orderInputs[id];delete orderNotes[id];openNotes.delete(id);renderOrders();toast('목록에서 뺐습니다. 위의 직접 추가로 다시 넣을 수 있어요.');});
+
+  // 직접 추가: 품목명 검색 → 고르기
+  function renderAddList(){const q=$('orderAddInput').value.trim().toLowerCase();const inList=new Set(orderListItems().map(i=>i.id));
+    const cands=state.items.filter(i=>!inList.has(i.id)&&i.name.toLowerCase().includes(q)).sort(byName);
+    $('orderAddList').innerHTML=cands.length?cands.map(i=>`<li class="dd-opt" role="option" tabindex="0" data-add="${i.id}"><span>${escapeHtml(i.name)}</span><small>현재 ${escapeHtml(qtyText(i))} · ${escapeHtml(i.supplier)}</small></li>`).join(''):'<li class="dd-empty">추가할 수 있는 품목이 없습니다</li>';
+    $('orderAddList').hidden=false;}
+  $('orderAddInput').addEventListener('focus',renderAddList);
+  $('orderAddInput').addEventListener('input',renderAddList);
+  $('orderAddList').addEventListener('click',e=>{const li=e.target.closest('[data-add]');if(!li)return;const addId=Number(li.dataset.add);excludedIds.delete(addId);manualOrderIds.delete(addId);manualOrderIds.add(addId);$('orderAddInput').value='';$('orderAddList').hidden=true;renderOrders();toast('발주 목록에 추가했습니다.');});
+  $('orderAddList').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset.add){e.preventDefault();e.target.click();}});
+  document.addEventListener('click',e=>{if(!e.target.closest('.order-add'))$('orderAddList').hidden=true;});
+
+  function orderError(msg){$('orderMessage').textContent=msg;$('orderMessage').classList.add('error');}
+  $('completeOrder').addEventListener('click',()=>{const buyer=selectedValue('buyerSelect','buyerName');if(!buyer)return orderError('발주자 이름을 입력해 주세요.');
+    const list=orderListItems();if(!list.length){renderOrders();return;}
+    const orders=[];
+    for(const item of list){const o=currentAmount(item);const b=item.bundleUnit?Number(o.b||0):0,e=Number(o.e||0);
+      if(!Number.isFinite(b)||!Number.isFinite(e)||b<0||e<0)return orderError('발주 수량을 숫자로 입력해 주세요.');
+      if(b>0||e>0)orders.push({item,b,e});}
+    if(!orders.length)return orderError('발주 수량을 입력해 주세요.');
+    $('orderMessage').textContent='';
+    // 확인 창 띄우기
+    pendingOrder={buyer,orders};
+    const sups=new Map();orders.forEach(({item})=>{const k=item.supplier||'거래처 정보 없음';sups.set(k,(sups.get(k)||0)+1);});
+    $('confirmSum').innerHTML=`<div><b>발주자</b>${escapeHtml(buyer)}</div><div><b>품목</b>${orders.length}개 · <b>거래처</b>${sups.size}곳</div><div class="cs-sups">${[...sups].map(([s,n])=>`${escapeHtml(s)} ${n}개`).join(' · ')}</div>`;
+    openModal('confirmModal');});
+  let pendingOrder=null;
+  function openModal(id){$(id).classList.add('open');}
+  function closeModal(id){$(id).classList.remove('open');}
+  document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
+  ['confirmModal','msgModal','histEditModal'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target===$(id))closeModal(id);}));
+  $('confirmOrder').addEventListener('click',()=>{if(!pendingOrder)return;closeModal('confirmModal');const {buyer,orders}=pendingOrder;pendingOrder=null;
+    const now=new Date();const record={date:now.toLocaleDateString('ko-KR'),time:now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hour12:false}),ts:now.getTime(),buyer,memo:$('orderMemo').value.trim(),items:[]};
+    orders.forEach(({item,b,e})=>{const amount=amountOf(item,{b,e});let split='';
+      if(item.bundleUnit){
+        item.bundleQty+=b;item.eachQty=Number((item.eachQty+e).toFixed(6));
+        // 낱개가 묶음 하나 이상 쌓이면 묶음으로 올리기 (예: 1판 30개)
+        const up=Math.floor((item.eachQty+1e-9)/item.bundleSize);if(up>0){item.bundleQty+=up;item.eachQty=Number((item.eachQty-up*item.bundleSize).toFixed(6));}
+        split=`${fmt(b)}${item.bundleUnit} ${fmt(e)}${item.eachUnit}`;
+      }else item.eachQty=Number((item.eachQty+amount).toFixed(6));
+      // bu/size/b/e: 문자 글과 기록 수정에 쓰는 묶음 정보
+      record.items.push({itemId:item.id,name:item.name,amount,unit:item.eachUnit,supplier:item.supplier,split,bu:item.bundleUnit||'',size:item.bundleUnit?Number(item.bundleSize):0,b,e,note:(orderNotes[item.id]||'').trim()});});
+    state.history.unshift(record);historyPage=1;manualOrderIds.clear();excludedIds.clear();orderInputs={};orderNotes={};openNotes.clear();$('orderMemo').value='';persist();
+    addOption('buyerSelect',buyer);saveOptions();$('buyerName').value='';$('buyerSelect').value='';renderDropdown('buyerSelect');updateRegisterForm();renderInventory();renderOrders();renderHistory();openMessages(record);toast('발주가 확정되었습니다. 거래처별 문자를 확인하세요.');});
+
+  // ===== 거래처별 문자 글 =====
+  function qtyPhrase(it){if(it.bu){const p=[];if(Number(it.b)>0)p.push(`${fmt(it.b)}${it.bu}`);if(Number(it.e)>0)p.push(`${fmt(it.e)}${it.unit}`);if(p.length)return p.join(' ');}return `${fmt(it.amount)}${it.unit}`;}
+  function buildMessages(r){
+    const m=new Map();r.items.forEach(i=>{const k=i.supplier||'거래처 정보 없음';if(!m.has(k))m.set(k,[]);m.get(k).push(i);});
+    const hello=storeName&&storeName!=='매장'?`안녕하세요, ${storeName}입니다.`:'안녕하세요.';
+    return [...m].map(([sup,its])=>({sup,text:[hello,'아래와 같이 발주 부탁드립니다.','',...its.map(i=>`- ${i.name} ${qtyPhrase(i)}${i.note?` (${i.note})`:''}`),...(r.memo?['',`요청사항: ${r.memo}`]:[]),'','감사합니다.'].join('\n')}));
+  }
+  function openMessages(r){
+    const msgs=buildMessages(r);
+    $('msgSub').textContent=`${dateWithDay(r)} ${r.time} · 발주자 ${r.buyer} · 거래처 ${msgs.length}곳`;
+    $('msgList').innerHTML=msgs.map((m,idx)=>`<div class="msg-block"><div class="msg-head"><strong>${escapeHtml(m.sup)}</strong><button type="button" class="soft" data-copy="${idx}">복사</button></div><textarea class="ta" data-msg="${idx}" aria-label="${escapeHtml(m.sup)} 문자 글">${escapeHtml(m.text)}</textarea></div>`).join('');
+    openModal('msgModal');$('msgModal').querySelector('.modal').scrollTop=0;
+  }
+  function copyText(ta){const text=ta.value;
+    const fallback=()=>{try{ta.focus();ta.select();ta.setSelectionRange(0,text.length);const ok=document.execCommand('copy');ta.setSelectionRange(0,0);ta.blur();return ok;}catch(e){return false;}};
+    if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(text).then(()=>true,()=>fallback());
+    return Promise.resolve(fallback());}
+  $('msgList').addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(!b)return;const ta=$('msgList').querySelector(`[data-msg="${b.dataset.copy}"]`);
+    copyText(ta).then(ok=>{if(!ok){toast('복사가 안 됐어요. 글을 길게 눌러 직접 복사해 주세요.');return;}b.textContent='복사됨 ✓';setTimeout(()=>b.textContent='복사',1500);toast('복사했습니다. 문자나 카톡에 붙여넣으세요.');});});
+  const openLogs=new Set();   // 수정 내역을 펼친 기록
+  let historyPage=1;const HIST_SIZE=10;
+  // 기록 날짜(예: 2026. 11. 11.)에서 '2026-11' 꺼내기
+  // 날짜 뒤에 요일 붙이기 (예: 2026. 11. 11. (수))
+  function dateWithDay(r){const m=String(r.date).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);if(!m)return r.date;
+    const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]));return `${r.date} (${'일월화수목금토'[d.getDay()]})`;}
+  function monthKey(r){const m=String(r.date).match(/(\d{4})\D+(\d{1,2})/);return m?`${m[1]}-${m[2].padStart(2,'0')}`:'';}
+  function renderMonthOptions(){const hid=$('histMonth'),cur=hid.value||'all';
+    const months=[...new Set(state.history.map(monthKey).filter(Boolean))].sort().reverse();
+    const v=months.includes(cur)?cur:'all';hid.value=v;
+    const label=k=>{if(k==='all')return '전체';const [y,m]=k.split('-');return `${y}년 ${Number(m)}월`;};
+    $('histMonthBtn').textContent=label(v);
+    document.querySelector('#histMonthDD .dd-list').innerHTML=['all',...months].map(k=>`<li role="option" tabindex="0" class="dd-opt${k===v?' selected':''}" data-month="${k}" aria-selected="${k===v}"><span>${label(k)}</span></li>`).join('');}
+  (()=>{const wrap=$('histMonthDD'),btn=$('histMonthBtn'),list=wrap.querySelector('.dd-list');
+    btn.addEventListener('click',()=>{const open=list.hidden;closeDropdowns(wrap);list.hidden=!open;btn.setAttribute('aria-expanded',String(open));});
+    list.addEventListener('click',e=>{const li=e.target.closest('[data-month]');if(!li)return;list.hidden=true;btn.setAttribute('aria-expanded','false');$('histMonth').value=li.dataset.month;historyPage=1;renderHistory();btn.focus();});
+    list.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset.month){e.preventDefault();e.target.click();}});})();
+  function renderHistory(){
+    renderMonthOptions();const month=$('histMonth').value;
+    const list=(month==='all'?state.history:state.history.filter(r=>monthKey(r)===month)).slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
+    if(!state.history.length){$('historyList').innerHTML='<div class="empty"><strong>발주 기록이 없습니다.</strong>발주를 완료하면 이곳에 내역이 쌓입니다.</div>';$('historyPagination').innerHTML='';return;}
+    if(!list.length){$('historyList').innerHTML='<div class="empty"><strong>선택한 달의 발주 기록이 없습니다.</strong>다른 달을 선택해 주세요.</div>';$('historyPagination').innerHTML='';return;}
+    const totalPages=Math.max(1,Math.ceil(list.length/HIST_SIZE));if(historyPage>totalPages)historyPage=totalPages;
+    const rows=list.slice((historyPage-1)*HIST_SIZE,historyPage*HIST_SIZE);
+    const groupBySup=r=>{const m=new Map();r.items.forEach(i=>{const k=i.supplier||'거래처 정보 없음';if(!m.has(k))m.set(k,[]);m.get(k).push(i);});return [...m];};
+    const itemText=i=>`${escapeHtml(i.name)} · ${fmt(i.amount)}${escapeHtml(i.unit)}${i.split?` (${escapeHtml(i.split)})`:''}${i.edited?'<span class="pill edited-pill">수정</span>':''}`;
+    const editedPill=r=>r.edits&&r.edits.length?'<span class="pill edited-pill">수정됨</span>':'';
+    const actions=r=>`<div class="hist-actions"><button type="button" data-hist-edit="${r.ts}">수정</button><button type="button" class="soft" data-hist-msg="${r.ts}">문자</button></div>`;
+    // 수정 내역: 언제 · 누가 · 무엇을
+    const editLog=r=>`<ul class="edit-log">${r.edits.slice().reverse().map(ed=>`<li><div class="el-head">${escapeHtml(ed.date)} ${escapeHtml(ed.time)} · ${escapeHtml(ed.editor)} 수정</div><div>${ed.changes.map(escapeHtml).join('<br>')}</div></li>`).join('')}</ul>`;
+    const newest=state.history.slice().sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
+    const memoHtml=r=>r.memo?escapeHtml(r.memo).replace(/\n/g,'<br>'):'<span class="memo-empty">메모 없음</span>';
+    // 컴퓨터: 품목 한 줄씩, 날짜·시간·발주자·거래처는 칸 합치기
+    const table=rows.map((r,ri)=>{const groups=groupBySup(r);const n=r.items.length;let first=true,h='';
+      groups.forEach(([sup,its])=>its.forEach((i,idx)=>{
+        h+='<tr>'+(first?`<td rowspan="${n}">${escapeHtml(dateWithDay(r))}</td><td rowspan="${n}">${escapeHtml(r.time)}${editedPill(r)}</td><td rowspan="${n}">${escapeHtml(r.buyer)}</td>`:'')
+          +(idx===0?`<td class="h-sup" rowspan="${its.length}">${escapeHtml(sup)}</td>`:'')
+          +`<td class="h-item">${itemText(i)}</td><td class="h-note">${i.note?escapeHtml(i.note):''}</td>`+(first?`<td rowspan="${n}">${actions(r)}</td>`:'')+'</tr>';first=false;}));
+      h+=`<tr class="memo-row"><td colspan="7"><span class="memo-label">메모</span>${memoHtml(r)}</td></tr>`;
+      if(r.edits&&r.edits.length)h+=`<tr class="memo-row edit-row"><td colspan="7"><span class="memo-label edit-label">수정 내역</span>${editLog(r)}</td></tr>`;
+      return `<tbody class="hist-rec${r===newest?' latest':''}">${h}</tbody>`;}).join('<tbody class="hist-gap" aria-hidden="true"><tr><td colspan="7"></td></tr></tbody>');
+    // 휴대폰: 발주 한 건 = 카드 하나
+    const cards=rows.map(r=>`<article class="hist-card${r===newest?' latest':''}"><div class="hist-card-top"><div><strong>${escapeHtml(r.buyer)}</strong>${r.edits&&r.edits.length?'<span class="hc-edited">수정됨</span>':''}<div class="hc-date">${escapeHtml(dateWithDay(r))} ${escapeHtml(r.time)}</div></div>${actions(r)}</div>${groupBySup(r).map(([sup,its])=>`<section class="hc-sup"><div class="hc-sup-head"><span>${escapeHtml(sup)}</span><small>${its.length}개 품목</small></div><ul class="hc-items">${its.map(i=>`<li${i.edited?' class="edited" title="수정된 품목"':''}><div class="hc-row"><span class="hc-name">${escapeHtml(i.name)}</span><span class="hc-qty">${escapeHtml(qtyPhrase(i))}${i.bu&&Number(i.b)>0&&Number(i.e)>0?`<small>총 ${fmt(i.amount)}${escapeHtml(i.unit)}</small>`:''}</span></div>${i.note?`<div class="hc-note">${escapeHtml(i.note)}</div>`:''}</li>`).join('')}</ul></section>`).join('')}<div class="hist-card-memo"><span class="memo-label">메모</span>${memoHtml(r)}</div>${r.edits&&r.edits.length?`<div class="hist-card-edits"><button type="button" class="edit-toggle" data-log-toggle="${r.ts}" aria-expanded="${openLogs.has(String(r.ts))}">수정 내역 ${openLogs.has(String(r.ts))?'닫기':'보기'} <span class="et-count">${r.edits.length}건</span><span class="et-arrow">${openLogs.has(String(r.ts))?'▲':'▼'}</span></button>${openLogs.has(String(r.ts))?editLog(r):''}</div>`:''}</article>`).join('');
+    $('historyList').innerHTML=`<div class="hist-wrap"><table class="hist"><thead><tr><th>발주 날짜</th><th>발주 시간</th><th>발주자</th><th>거래처</th><th>발주 품목 및 수량</th><th>특이사항</th><th>관리</th></tr></thead>${table}</table></div><div class="hist-cards">${cards}</div>`;
+    renderPagination(totalPages,historyPage,'historyPagination');
+  }
+  // ===== 발주 기록: 문자 다시 보기 / 수정 =====
+  const findRec=ts=>state.history.find(r=>String(r.ts)===String(ts));
+  let editingRec=null;
+  $('historyList').addEventListener('click',e=>{
+    const lt=e.target.closest('[data-log-toggle]');if(lt){const k=lt.dataset.logToggle;openLogs.has(k)?openLogs.delete(k):openLogs.add(k);renderHistory();return;}
+    const mb=e.target.closest('[data-hist-msg]');if(mb){const r=findRec(mb.dataset.histMsg);if(r)openMessages(r);return;}
+    const eb=e.target.closest('[data-hist-edit]');if(eb){const r=findRec(eb.dataset.histEdit);if(r)openHistEdit(r);}
+  });
+  const twoUnit=it=>!!it.bu&&Number(it.size)>0;
+  function renderEditorDD(){const v=$('heEditor').value,btn=$('heEditorBtn');
+    btn.textContent=v==='custom'?'직접입력':(v||'수정자 선택');btn.classList.toggle('placeholder',!v);
+    $('heEditorDD').querySelector('.dd-list').innerHTML=ddOptions.buyerSelect.map(n=>optLi(n,n,n===v)).join('')+optLi('custom','직접입력',v==='custom');
+    $('heEditorCustomWrap').hidden=v!=='custom';}
+  bindSimpleDD($('heEditorDD'),v=>{$('heEditor').value=v;if(v!=='custom')$('heEditorCustom').value='';renderEditorDD();if(v==='custom')$('heEditorCustom').focus();});
+  function openHistEdit(r){
+    editingRec=r;
+    $('heSub').textContent=`${dateWithDay(r)} ${r.time} · 발주자 ${r.buyer}`;
+    $('heItems').innerHTML=r.items.map((it,idx)=>{const two=twoUnit(it);
+      const b=two?(it.b!=null?it.b:Math.floor((Number(it.amount)+1e-9)/it.size)):0;
+      const e=two?(it.e!=null?it.e:Number(it.amount)-b*it.size):it.amount;
+      return `<div class="he-item" data-idx="${idx}"><div class="he-head"><strong>${escapeHtml(it.name)}</strong><span class="pill">${escapeHtml(it.supplier||'')}</span></div>
+        <div class="he-qty">${two?`<input type="text" class="num-input" inputmode="numeric" data-he="b" value="${fmt(b)}" aria-label="${escapeHtml(it.name)} 묶음 수량" /><span>${escapeHtml(it.bu)}</span>`:''}<input type="text" class="num-input" data-decimal="1" inputmode="decimal" data-he="e" value="${fmt(e)}" aria-label="${escapeHtml(it.name)} 수량" /><span>${escapeHtml(it.unit)}</span></div>
+        <input type="text" class="he-note" data-he="note" maxlength="100" placeholder="특이사항" value="${escapeHtml(it.note||'')}" aria-label="${escapeHtml(it.name)} 특이사항" /></div>`;}).join('');
+    $('heMemo').value=r.memo||'';$('heEditor').value='';$('heEditorCustom').value='';$('heMsg').textContent='';renderEditorDD();
+    openModal('histEditModal');$('histEditModal').querySelector('.modal').scrollTop=0;
+  }
+  $('heSave').addEventListener('click',()=>{const r=editingRec;if(!r)return;const err=m=>{$('heMsg').textContent=m;};
+    const editor=$('heEditor').value==='custom'?$('heEditorCustom').value.trim():$('heEditor').value;
+    if(!editor)return err('수정자를 선택해 주세요.');
+    const changes=[],newItems=[],adjust=[];
+    for(const box of $('heItems').querySelectorAll('.he-item')){
+      const it=r.items[Number(box.dataset.idx)],two=twoUnit(it);const val=k=>{const el=box.querySelector(`[data-he="${k}"]`);return el?el.value.trim():'';};
+      const b=two?Number(val('b')||0):0,e=Number(val('e')||0),note=val('note');
+      if(!Number.isFinite(b)||!Number.isFinite(e)||b<0||e<0)return err('수량을 숫자로 입력해 주세요.');
+      const amount=two?Number((b*it.size+e).toFixed(6)):e;
+      const nIt={...it,amount,note};if(two){nIt.b=b;nIt.e=e;nIt.split=`${fmt(b)}${it.bu} ${fmt(e)}${it.unit}`;}
+      const oldB=two?Number(it.b!=null?it.b:Math.floor((Number(it.amount)+1e-9)/it.size)):0;
+      let changed=false;
+      if(amount!==Number(it.amount)||(two&&b!==oldB)){changes.push(`${it.name} 수량: ${qtyPhrase(it)} → ${amount?qtyPhrase(nIt):'0 (기록에서 뺌)'}`);adjust.push({it,diff:amount-Number(it.amount)});changed=true;}
+      if(note!==(it.note||'')){changes.push(`${it.name} 특이사항: ${it.note||'없음'} → ${note||'없음'}`);changed=true;}
+      if(changed)nIt.edited=true;
+      if(amount>0)newItems.push(nIt);
+    }
+    const memo=$('heMemo').value.trim();if(memo!==(r.memo||''))changes.push(`메모: ${r.memo||'없음'} → ${memo||'없음'}`);
+    if(!changes.length)return err('바뀐 내용이 없어요.');
+    if(!newItems.length)return err('품목이 하나 이상 남아 있어야 해요.');
+    // 재고도 바뀐 만큼 고치기
+    const missing=[];
+    adjust.forEach(({it,diff})=>{if(!diff)return;const inv=state.items.find(x=>x.id===it.itemId)||state.items.find(x=>x.name===it.name);if(!inv){missing.push(it.name);return;}
+      if(inv.bundleUnit&&Number(inv.bundleSize)>0){const t=Math.max(0,total(inv)+diff);inv.bundleQty=Math.floor((t+1e-9)/inv.bundleSize);inv.eachQty=Number((t-inv.bundleQty*inv.bundleSize).toFixed(6));}
+      else inv.eachQty=Math.max(0,Number((Number(inv.eachQty||0)+diff).toFixed(6)));});
+    const now=new Date();const d=now.toLocaleDateString('ko-KR');
+    r.items=newItems;r.memo=memo;r.edits=(r.edits||[]).concat({ts:now.getTime(),date:dateWithDay({date:d}),time:now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hour12:false}),editor,changes});
+    addOption('buyerSelect',editor);saveOptions();renderDropdown('buyerSelect');
+    persist();closeModal('histEditModal');editingRec=null;renderInventory();renderOrders();renderHistory();
+    toast(missing.length?`기록을 수정했어요. (${missing.join(', ')}: 재고 목록에 없어 재고는 그대로)`:'발주 기록과 재고를 수정했습니다.');
+  });
+  $('historyPagination').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b||b.disabled)return;historyPage=Number(b.dataset.page);renderHistory();$('view-history').scrollIntoView({behavior:'smooth',block:'start'});});
+  $('saveBtn').addEventListener('click',()=>{try{persist();toast('저장되었습니다.');}catch(e){toast('저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.');}});
+  // 제목의 '매장' 부분 바꾸기 (확인하면 바로 저장)
+  const STORE_KEY='food-order-manager-store-name';
+  let storeName='매장';
+  try{storeName=localStorage.getItem(STORE_KEY)||'매장';}catch(e){}
+  function renderTitle(){$('storeNameText').textContent=storeName;document.title=`${storeName} 재고·발주 관리`;}
+  function setStoreEditing(on){$('storeNameBtn').hidden=on;$('storeNameInput').hidden=!on;$('storeActions').hidden=!on;if(on){$('storeNameInput').value=storeName;$('storeNameInput').focus();$('storeNameInput').select();}}
+  function confirmStoreName(){storeName=$('storeNameInput').value.trim().slice(0,12)||'매장';try{localStorage.setItem(STORE_KEY,storeName);}catch(e){}renderTitle();setStoreEditing(false);toast('매장 이름이 저장되었습니다.');}
+  $('storeNameBtn').addEventListener('click',()=>setStoreEditing(true));
+  $('storeOk').addEventListener('click',confirmStoreName);
+  $('storeCancel').addEventListener('click',()=>setStoreEditing(false));
+  $('storeNameInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();confirmStoreName();}else if(e.key==='Escape')setStoreEditing(false);});
+  renderTitle();
+  renderInventory();renderOrders();renderHistory();
+})();
+</script>
+</body>
+</html>
